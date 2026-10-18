@@ -11,11 +11,28 @@ export const CONTACT_LIMITS = {
   message: { min: 10, max: 3000 },
 } as const;
 
+export const CONTACT_SUBJECTS = {
+  arquitectura: 'Arquitectura e construção',
+  creative: 'Creative Studio',
+  tecnologia: 'Soluções tecnológicas (parceria Learn Code)',
+  outro: 'Outro assunto',
+} as const;
+
+export type ContactSubject = keyof typeof CONTACT_SUBJECTS;
+
+export const CONTACT_SUBJECT_KEYS = Object.keys(CONTACT_SUBJECTS) as ContactSubject[];
+
+export function isContactSubject(value: unknown): value is ContactSubject {
+  return typeof value === 'string' && Object.prototype.hasOwnProperty.call(CONTACT_SUBJECTS, value);
+}
+
 export interface ContactFields {
   name: string;
   email: string;
   organization: string;
   phone: string;
+  /** One of CONTACT_SUBJECT_KEYS, or '' when not chosen (invalid). */
+  subject: ContactSubject | '';
   message: string;
 }
 
@@ -27,6 +44,7 @@ export const CONTACT_FIELD_NAMES: readonly ContactFieldName[] = [
   'email',
   'organization',
   'phone',
+  'subject',
   'message',
 ];
 
@@ -40,6 +58,7 @@ export const CONTACT_MESSAGES = {
   organizationTooLong: `A organização não pode exceder ${CONTACT_LIMITS.organization.max} caracteres.`,
   phoneInvalid: 'Indique um número de telefone válido (apenas dígitos, espaços, +, -, parênteses).',
   phoneTooLong: `O telefone não pode exceder ${CONTACT_LIMITS.phone.max} caracteres.`,
+  subjectRequired: 'Seleccione o assunto do seu contacto.',
   messageRequired: 'Escreva a sua mensagem.',
   messageTooShort: `A mensagem deve ter pelo menos ${CONTACT_LIMITS.message.min} caracteres.`,
   messageTooLong: `A mensagem não pode exceder ${CONTACT_LIMITS.message.max} caracteres.`,
@@ -79,6 +98,7 @@ export function normaliseContactInput(raw: unknown): ContactFields {
     email: normaliseLine(source.email).toLowerCase(),
     organization: normaliseLine(source.organization),
     phone: normaliseLine(source.phone),
+    subject: isContactSubject(source.subject) ? source.subject : '',
     message: normaliseText(source.message),
   };
 }
@@ -106,6 +126,8 @@ export function validateContactFields(fields: ContactFields): ContactFieldErrors
       errors.phone = CONTACT_MESSAGES.phoneInvalid;
     }
   }
+
+  if (!fields.subject) errors.subject = CONTACT_MESSAGES.subjectRequired;
 
   if (!fields.message) errors.message = CONTACT_MESSAGES.messageRequired;
   else if (fields.message.length < CONTACT_LIMITS.message.min) errors.message = CONTACT_MESSAGES.messageTooShort;

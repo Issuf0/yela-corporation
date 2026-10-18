@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { createRateLimiter } from '../server/contact/antiSpam';
-import { handleContactRequest, MAX_BODY_BYTES, RESPONSE_MESSAGES } from '../server/contact/handler';
+import { handleContactRequest, MAX_BODY_BYTES, RESPONSE_MESSAGES, type ContactHandlerDeps } from '../server/contact/handler';
 import { createMockSender } from '../server/email/mockSender';
 import { freshLimiter, input, logger, okConfig, SUBMISSION_ID, validPayload } from './helpers';
 
-const run = (overrides: Parameters<typeof input>[0] = {}, body?: unknown, deps: Partial<Parameters<typeof handleContactRequest>[1]> = {}) => {
-  const sender = deps.sender ?? createMockSender();
+/** Runs the handler; `sender` in the result is the default mock (ignored when deps override it). */
+const run = (overrides: Parameters<typeof input>[0] = {}, body?: unknown, deps: Partial<ContactHandlerDeps> = {}) => {
+  const sender = createMockSender();
   return handleContactRequest(input(overrides, body), {
     config: okConfig(),
     sender,
@@ -120,11 +121,30 @@ describe('handleContactRequest — delivery', () => {
     ]);
   });
 
-  it('copies Learn Code only when configured, with its own idempotency key', async () => {
-    const { sender } = await run({}, undefined, { config: okConfig({ learnCodeEmail: 'tech@example.org' }) });
-    expect(sender.sent).toHaveLength(2);
-    expect(sender.sent[1]?.message.to).toEqual(['tech@example.org']);
-    expect(sender.sent[1]?.options.idempotencyKey).toBe(`contact/${SUBMISSION_ID}/learncode`);
+  it('copies Learn Code only for technology enquiries and only when configured', async () => {
+    const tech = { ...validPayload(), subject: 'tecnologia' };
+    const withRouting = okConfig({ learnCodeEmail: 'tech@example.org' });
+
+    const a = await run({}, tech, { config: withRouting });
+    expect(a.sender.sent).toHaveLength(2);
+    expect(a.sender.sent[1]?.message.to).toEqual(['tech@example.org']);
+    expect(a.sender.sent[1]?.message.subject).toBe('Novo contacto — YELA Corporation');
+    expect(a.sender.sent[1]?.message.text).toContain('encaminhado no âmbito da parceria');
+    expect(a.sender.sent[1]?.options.idempotencyKey).toBe(`contact/${SUBMISSION_ID}/learncode`);
+    expect(a.sender.sent[0]?.message.text).not.toContain('encaminhado no âmbito da parceria');
+
+    const b = await run({}, { ...validPayload(), subject: 'arquitectura' }, { config: withRouting });
+    expect(b.sender.sent).toHaveLength(1);
+
+    const c = await run({}, tech, { config: okConfig({ learnCodeEmail: null }) });
+    expect(c.sender.sent).toHaveLength(1);
+  });
+
+  it('rejects an unknown subject with a field error', async () => {
+    const { result, sender } = await run({}, { ...validPayload(), subject: 'financeiro' });
+    expect(result.status).toBe(400);
+    expect(result.body.ok === false && result.body.fieldErrors?.subject).toBeDefined();
+    expect(sender.sent).toHaveLength(0);
   });
 
   it('sends the visitor acknowledgement only when enabled', async () => {
@@ -137,7 +157,7 @@ describe('handleContactRequest — delivery', () => {
   });
 
   it('returns 503 and sends nothing when configuration is incomplete', async () => {
-    const { result, sender } = await run({}, undefined, {
+    const { result } = await run({}, undefined, {
       config: { ok: false, missing: ['RESEND_API_KEY'] },
       sender: null,
     });
@@ -146,7 +166,6 @@ describe('handleContactRequest — delivery', () => {
     if (result.body.ok) return;
     expect(result.body.message).toBe(RESPONSE_MESSAGES.serviceUnavailable);
     expect(JSON.stringify(result.body)).not.toContain('RESEND');
-    expect(sender.sent).toHaveLength(0);
   });
 
   it('returns a generic 502 when the provider fails, hiding provider details', async () => {

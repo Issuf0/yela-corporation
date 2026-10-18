@@ -163,12 +163,14 @@ export async function handleContactRequest(input: ContactRequestInput, deps: Con
   }
 
   // Secondary deliveries are best-effort: the request has already been received by YELA.
+  // Learn Code only receives technology enquiries (partnership agreement, clause 7), and only when configured.
   const secondary: Promise<void>[] = [];
-  if (contact.learnCodeEmail) {
+  if (contact.learnCodeEmail && fields.subject === 'tecnologia') {
+    const partnerNotification = buildInternalNotification({ fields, submissionId, receivedAt, audience: 'partner' });
     secondary.push(
       sender
         .send(
-          { from: contact.fromEmail, to: [contact.learnCodeEmail], replyTo: fields.email, ...notification },
+          { from: contact.fromEmail, to: [contact.learnCodeEmail], replyTo: fields.email, ...partnerNotification },
           { idempotencyKey: `contact/${submissionId}/learncode` },
         )
         .then((result) => {

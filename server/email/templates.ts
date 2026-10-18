@@ -1,4 +1,4 @@
-import type { ContactFields } from '../../src/lib/contactSchema';
+import { CONTACT_SUBJECTS, type ContactFields } from '../../src/lib/contactSchema';
 
 export const INTERNAL_SUBJECT = 'Novo contacto — YELA Corporation';
 export const ACK_SUBJECT = 'Recebemos o seu contacto — YELA Corporation';
@@ -35,6 +35,12 @@ interface InternalNotificationInput {
   fields: ContactFields;
   submissionId: string;
   receivedAt: Date;
+  /** 'partner' adds a line explaining the request came in through YELA's website. */
+  audience?: 'internal' | 'partner';
+}
+
+export function subjectLabel(fields: ContactFields): string {
+  return fields.subject ? CONTACT_SUBJECTS[fields.subject] : 'Não especificado';
 }
 
 const STYLE = {
@@ -69,12 +75,18 @@ function wrap(title: string, content: string, footer: string): string {
 </html>`;
 }
 
-export function buildInternalNotification({ fields, submissionId, receivedAt }: InternalNotificationInput): EmailContent {
+export function buildInternalNotification({ fields, submissionId, receivedAt, audience = 'internal' }: InternalNotificationInput): EmailContent {
   const timestamp = formatMaputoTimestamp(receivedAt);
   const organization = fields.organization || '—';
   const phone = fields.phone || '—';
+  const subject = subjectLabel(fields);
+  const intro =
+    audience === 'partner'
+      ? 'Pedido recebido através do website da YELA Corporation e encaminhado no âmbito da parceria YELA Corporation × Learn Code.'
+      : 'Foi submetido um novo pedido de contacto através do formulário do website institucional.';
 
   const rows: Array<[string, string]> = [
+    ['Assunto', `<strong>${escapeHtml(subject)}</strong>`],
     ['Nome', escapeHtml(fields.name)],
     ['Email', `<a href="mailto:${escapeHtml(fields.email)}" style="${STYLE.accent}">${escapeHtml(fields.email)}</a>`],
     ['Organização', escapeHtml(organization)],
@@ -89,7 +101,7 @@ export function buildInternalNotification({ fields, submissionId, receivedAt }: 
 
   const html = wrap(
     'Novo contacto através do website',
-    `<p style="margin:0 0 16px;">Foi submetido um novo pedido de contacto através do formulário do website institucional.</p>
+    `<p style="margin:0 0 16px;">${escapeHtml(intro)}</p>
      ${table}
      <div style="${STYLE.message}">
        <div style="${STYLE.label};width:auto;padding:0 0 8px;">Mensagem</div>
@@ -101,6 +113,9 @@ export function buildInternalNotification({ fields, submissionId, receivedAt }: 
   const text = [
     'Novo contacto através do website — YELA Corporation',
     '',
+    intro,
+    '',
+    `Assunto: ${subject}`,
     `Nome: ${fields.name}`,
     `Email: ${fields.email}`,
     `Organização: ${organization}`,

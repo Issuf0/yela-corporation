@@ -1,4 +1,4 @@
-import type { ConfigResult } from '../server/config';
+import type { ConfigResult, ContactConfig } from '../server/config';
 import { createRateLimiter } from '../server/contact/antiSpam';
 import type { ContactRequestInput } from '../server/contact/handler';
 import { silentLogger } from '../server/logger';
@@ -14,10 +14,11 @@ export const validPayload = () => ({
   email: 'maria.silva@example.com',
   organization: 'Exemplo, Lda',
   phone: '+258 84 000 0000',
+  subject: 'arquitectura',
   message: 'Gostaria de saber mais sobre a vossa atuação em Nampula.',
 });
 
-export const okConfig = (overrides: Partial<ConfigResult & { ok: true }>['value'] extends infer V ? Partial<NonNullable<V>['contact']> : never = {}): ConfigResult => ({
+export const okConfig = (overrides: Partial<ContactConfig> = {}): ConfigResult => ({
   ok: true,
   value: {
     senderMode: 'mock',

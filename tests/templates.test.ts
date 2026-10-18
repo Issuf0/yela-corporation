@@ -13,6 +13,7 @@ const fields = {
   email: 'maria@example.com',
   organization: 'Exemplo & Filhos',
   phone: '',
+  subject: 'tecnologia' as const,
   message: 'Linha 1\nLinha 2 <script>alert(1)</script>',
 };
 
@@ -35,9 +36,23 @@ describe('templates', () => {
     expect(content.html).toContain('Linha 1<br>Linha 2');
     expect(content.html).toContain('3f2a7c1e-9b4d-4e6f-8a1b-2c3d4e5f6a7b');
     expect(content.html).toContain('—'); // empty phone rendered as a dash
+    expect(content.html).toContain('Soluções tecnológicas (parceria Learn Code)');
+    expect(content.html).not.toContain('parceria YELA Corporation × Learn Code.');
+    expect(content.text).toContain('Assunto: Soluções tecnológicas (parceria Learn Code)');
     expect(content.text).toContain('Nome: Maria <Silva>');
     expect(content.text).toContain('Telefone: —');
     expect(content.text).toContain('Mensagem:\nLinha 1\nLinha 2');
+  });
+
+  it('adds the partnership origin line for the partner audience', () => {
+    const content = buildInternalNotification({
+      fields,
+      submissionId: '3f2a7c1e-9b4d-4e6f-8a1b-2c3d4e5f6a7b',
+      receivedAt: new Date(),
+      audience: 'partner',
+    });
+    expect(content.html).toContain('encaminhado no âmbito da parceria YELA Corporation × Learn Code');
+    expect(content.text).toContain('encaminhado no âmbito da parceria');
   });
 
   it('formats the timestamp in Maputo time (UTC+2)', () => {

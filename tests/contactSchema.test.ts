@@ -12,7 +12,8 @@ const valid = {
   email: 'Maria.Silva@Example.com',
   organization: 'Exemplo, Lda',
   phone: '+258 84 000 0000',
-  message: 'Gostaria de saber mais sobre a vossa atuação.',
+  subject: 'tecnologia',
+  message: 'Gostaria de saber mais sobre a vossa actuação.',
 };
 
 describe('normaliseContactInput', () => {
@@ -82,6 +83,12 @@ describe('validateContactFields', () => {
 
   it.each(['abc', '+258 8x 000', '12345'])('rejects invalid phone %s', (phone) => {
     expect(validateContactFields({ ...normalised(), phone }).phone).toBe(CONTACT_MESSAGES.phoneInvalid);
+  });
+
+  it('requires a known subject', () => {
+    expect(validateContactFields({ ...normalised(), subject: '' }).subject).toBe(CONTACT_MESSAGES.subjectRequired);
+    expect(normaliseContactInput({ ...valid, subject: 'hacker' }).subject).toBe('');
+    expect(normaliseContactInput({ ...valid, subject: 'outro' }).subject).toBe('outro');
   });
 
   it('allows empty optional fields', () => {
