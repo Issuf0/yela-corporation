@@ -17,6 +17,8 @@ export interface ServiceArea {
   cta: string;
   /** Executado em parceria com a Learn Code. */
   withLearnCode?: boolean;
+  /** Destaque opcional (produção própria, iniciativa) com ligação. */
+  highlight?: { label: string; text: string; href: string; external?: boolean };
 }
 
 export const SERVICE_AREAS: ServiceArea[] = [
@@ -91,6 +93,12 @@ export const SERVICE_AREAS: ServiceArea[] = [
     ],
     subject: 'audiovisual',
     cta: 'Falar sobre produção audiovisual',
+    highlight: {
+      label: 'OHOLO Podcast',
+      text: 'Produção própria da YELA: conversas e conteúdos que ligam Nampula ao resto do país.',
+      href: 'https://www.facebook.com/oholopodcast',
+      external: true,
+    },
   },
   {
     id: 'solucoes-digitais',

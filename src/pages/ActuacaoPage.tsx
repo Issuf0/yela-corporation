@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import React from 'react';
 import { CtaBand } from '../components/CtaBand';
 import { Container, Layout } from '../components/Layout';
@@ -37,6 +37,21 @@ export const ActuacaoPage: React.FC = () => (
               </h2>
               <p className="text-lg text-ink font-light leading-relaxed text-pretty">{area.lede}</p>
               <p className="text-base text-ink-2 font-light leading-relaxed text-pretty">{area.text}</p>
+              {area.highlight && (
+                <p className="text-sm text-ink-2 border-l-2 border-orange pl-4 py-1">
+                  <span className="font-semibold text-ink">{area.highlight.label}.</span> {area.highlight.text}{' '}
+                  <a
+                    href={area.highlight.href}
+                    target={area.highlight.external ? '_blank' : undefined}
+                    rel={area.highlight.external ? 'noopener noreferrer' : undefined}
+                    className="inline-flex items-center gap-1 underline underline-offset-4 text-ink hover:text-orange-ink"
+                  >
+                    Ouvir e seguir
+                    <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+                    {area.highlight.external && <span className="sr-only"> (abre numa nova janela)</span>}
+                  </a>
+                </p>
+              )}
               {area.withLearnCode && (
                 <p className="text-sm text-ink-3">
                   Execução técnica pela Learn Code.{' '}
