@@ -66,7 +66,7 @@ export const PartnershipSection: React.FC = () => (
 
       <div className="mt-14 sm:mt-20 pt-8 border-t border-line">
         <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-ink-3">Como funciona</h3>
-        <ol className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 list-none">
+        <ol className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 list-none">
           {FLOW.map((item) => (
             <li key={item.step} className="flex gap-4">
               <span className="font-mono text-xs text-orange-ink tracking-wider pt-1" aria-hidden="true">

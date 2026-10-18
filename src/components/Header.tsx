@@ -31,15 +31,16 @@ export const Header: React.FC<HeaderProps> = ({ homePath = '' }) => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setMenuOpen(false);
     };
-    const media = window.matchMedia('(min-width: 768px)');
+    // Close the drawer when the viewport grows to the desktop layout.
+    const media = typeof window.matchMedia === 'function' ? window.matchMedia('(min-width: 768px)') : null;
     const onResize = () => {
-      if (media.matches) setMenuOpen(false);
+      if (media?.matches) setMenuOpen(false);
     };
     window.addEventListener('keydown', onKey);
-    media.addEventListener('change', onResize);
+    media?.addEventListener('change', onResize);
     return () => {
       window.removeEventListener('keydown', onKey);
-      media.removeEventListener('change', onResize);
+      media?.removeEventListener('change', onResize);
     };
   }, [menuOpen]);
 
