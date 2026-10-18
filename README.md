@@ -17,7 +17,7 @@ Direcção visual: **YELA — Quiet Impact** (editorial, contido, fundos off-whi
 index.html, privacidade.html   páginas (build multi-página do Vite)
 src/main.tsx, src/privacy.tsx  pontos de entrada
 src/App.tsx                    homepage: Header, Hero, A YELA, Áreas, Parceria, Contacto, Footer
-src/components/                componentes (ContactForm, Logo, SignatureGraphic, PrivacyPage, ...)
+src/components/                componentes (ContactForm, Logo, PrivacyPage, ...)
 src/config/site.ts             contactos (WhatsApp, email), nome legal, tagline — alterar aqui
 src/lib/contactSchema.ts       validação partilhada do formulário (limites, mensagens em PT)
 src/lib/contactMessage.ts      texto da mensagem enviada por WhatsApp/email
