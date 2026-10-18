@@ -78,7 +78,8 @@ export const ParceriaPage: React.FC = () => (
           </p>
           <p className="text-base sm:text-lg text-ink-2 font-light leading-relaxed text-pretty">
             Para quem contacta a YELA, isto significa uma porta única: o mesmo interlocutor para um projecto de
-            arquitectura, uma marca, uma obra ou uma solução digital, com a execução técnica entregue a quem a domina.
+            arquitectura, uma marca, uma campanha ou uma solução digital, com a execução técnica entregue a quem a
+            domina. Toda a área de Soluções Digitais da YELA é executada com a Learn Code.
           </p>
         </div>
       </Container>
@@ -186,7 +187,7 @@ export const ParceriaPage: React.FC = () => (
     <CtaBand
       title="Tem um desafio tecnológico?"
       text="Descreva-nos a necessidade. A YELA acompanha a relação e a Learn Code faz a análise técnica e a proposta."
-      href="/contacto?assunto=tecnologia"
+      href="/contacto?assunto=digital"
       action="Pedir análise"
     />
     <NextPage path="/parceria" />

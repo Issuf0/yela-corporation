@@ -20,7 +20,7 @@ function fillValid() {
   fill(/nome completo/i, '  Maria   Silva ');
   fill(/^email/i, 'Maria@Example.com');
   fill(/telefone/i, '+258 84 000 0000');
-  fireEvent.change(screen.getByLabelText(/assunto/i), { target: { value: 'tecnologia' } });
+  fireEvent.change(screen.getByLabelText(/assunto/i), { target: { value: 'digital' } });
   fill(/mensagem/i, 'Precisamos de um sistema de gestão para a nossa clínica.');
 }
 
@@ -63,7 +63,7 @@ describe('ContactForm — visitor journey', () => {
     const text = decodeURIComponent(href.split('text=')[1] ?? '');
     expect(text).toContain('*Nome:* Maria Silva');
     expect(text).toContain('*Email:* maria@example.com');
-    expect(text).toContain('*Assunto:* Soluções tecnológicas (parceria Learn Code)');
+    expect(text).toContain('*Assunto:* Soluções Digitais (com a Learn Code)');
     expect(text).toContain('Precisamos de um sistema de gestão');
 
     expect(screen.getByRole('heading', { name: /mensagem aberta no whatsapp/i })).toBeTruthy();
@@ -79,7 +79,7 @@ describe('ContactForm — visitor journey', () => {
 
     const [href, channel] = open.mock.calls[0]!;
     expect(channel).toBe('email');
-    expect(decodeURIComponent(href)).toContain('subject=Contacto via website — Soluções tecnológicas');
+    expect(decodeURIComponent(href)).toContain('subject=Contacto via website — Soluções Digitais');
     expect(decodeURIComponent(href)).toContain('Nome: Maria Silva');
     expect(screen.getByRole('heading', { name: /mensagem aberta no seu email/i })).toBeTruthy();
     expect(screen.getByRole('link', { name: /enviar pelo whatsapp/i }).getAttribute('target')).toBe('_blank');
@@ -100,8 +100,11 @@ describe('ContactForm — visitor journey', () => {
     expect((screen.getByLabelText(/assunto/i) as HTMLSelectElement).value).toBe('');
   });
 
-  it('honours the preselected subject', () => {
+  it('honours the preselected subject, including legacy values', () => {
     render(<ContactForm initialSubject="arquitectura" />);
     expect((screen.getByLabelText(/assunto/i) as HTMLSelectElement).value).toBe('arquitectura');
+    cleanup();
+    render(<ContactForm initialSubject="tecnologia" />);
+    expect((screen.getByLabelText(/assunto/i) as HTMLSelectElement).value).toBe('digital');
   });
 });

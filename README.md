@@ -1,6 +1,6 @@
 # YELA Corporation — Website institucional
 
-Website público da **YELA Corporation, SA** (Maputo, Moçambique): arquitectura, creative studio e construções, com a parceria estratégica YELA × Learn Code.
+Website público da **YELA Corporation, SU, SAS** (Nampula, Moçambique): arquitectura, construção e estúdio criativo, em seis áreas de serviços, com a parceria estratégica YELA × Learn Code.
 
 Direcção visual: **YELA — Quiet Impact** (editorial, contido, fundos off-white, navy e laranja do logótipo).
 
@@ -107,9 +107,18 @@ Na Vercel, *Deployments → (deployment anterior) → Promote to Production* ou 
 
 O histórico git contém uma implementação completa e testada de envio automático via **Resend** com uma função Vercel (`api/contact.ts` + `server/`), removida por decisão de âmbito («só frontend»). Está nos commits «Limpeza do âmbito e backend do formulário de contacto» e «Campo Assunto no contacto e encaminhamento condicional para a Learn Code». Para a reactivar seria necessário: domínio da YELA verificado na Resend (registos DNS), chave de API na Vercel e repor esses ficheiros. Sem domínio próprio, a Resend só permite envios de teste.
 
+## Fontes dos conteúdos
+
+- Acordo de parceria (`assets/Learn Code X Yela Corp.-1.pdf`): responsabilidades, fluxo e princípios da parceria.
+- Portfólio de Serviços (`assets/PORTFÓLIO DE SERVIÇOS.docx`): áreas e listas de serviços, missão, visão, valores, pilares, promessa, equipa, sede (Nampula) e telefone.
+- Site da Learn Code: descrição da parceira.
+
 ## Pendentes para a YELA
 
-- Aprovar o redesenho vectorial do logótipo (`src/components/Logo.tsx`, `public/favicon.svg`) feito a partir do JPEG, e a imagem de partilha `public/og-image.png`.
-- Confirmar/afinar as frases das três áreas de actuação (Arquitectura, Creative Studio, Construções).
+- Confirmar a designação legal: o portfólio usa «YELA Corporation, SU, SAS» e «YELA Corporation S.A.»; o acordo usa «SA, SUS».
+- Confirmar a sede (Nampula, segundo o portfólio) e os telefones (WhatsApp +258 84 530 6215; telefone +258 83 444 6767).
+- Confirmar se o OHOLO Podcast é parceiro externo (como está em /parcerias) ou produção própria (o portfólio coloca-o no Departamento de Produção Audiovisual e Media).
+- Autorizar a publicação dos nomes da equipa em /sobre.
+- Aprovar o redesenho vectorial do logótipo (`src/components/Logo.tsx`, `public/favicon.svg`) e a imagem de partilha `public/og-image.png`.
 - Morada completa e registo comercial, e prazo de conservação de mensagens, para a página de privacidade.
 - Registar o domínio, criar a conta Vercel e definir `SITE_URL`.

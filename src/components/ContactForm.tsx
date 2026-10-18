@@ -7,7 +7,7 @@ import {
   CONTACT_SUBJECT_KEYS,
   CONTACT_SUBJECTS,
   hasErrors,
-  isContactSubject,
+  resolveSubject,
   normaliseContactInput,
   validateContactFields,
   type ContactFieldErrors,
@@ -57,7 +57,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ initialSubject = '' })
   const baseId = useId();
   const [values, setValues] = useState<FormValues>({
     ...EMPTY,
-    subject: isContactSubject(initialSubject) ? initialSubject : '',
+    subject: resolveSubject(initialSubject),
   });
   const [errors, setErrors] = useState<ContactFieldErrors>({});
   const [sent, setSent] = useState<{ channel: Channel; fields: ContactFields } | null>(null);

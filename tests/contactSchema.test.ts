@@ -12,7 +12,7 @@ const valid = {
   email: 'Maria.Silva@Example.com',
   organization: 'Exemplo, Lda',
   phone: '+258 84 000 0000',
-  subject: 'tecnologia',
+  subject: 'digital',
   message: 'Gostaria de saber mais sobre a vossa actuação.',
 };
 

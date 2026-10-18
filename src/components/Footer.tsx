@@ -1,4 +1,4 @@
-import { Mail, MessageCircle } from 'lucide-react';
+import { Mail, MessageCircle, Phone } from 'lucide-react';
 import React from 'react';
 import { NAV_PAGES } from '../config/nav';
 import { CONTACT, LEGAL_NAME, SOCIAL, TAGLINE, whatsappHref } from '../config/site';
@@ -31,6 +31,13 @@ export const Footer: React.FC = () => (
           <span>
             <span className="sr-only">WhatsApp: </span>
             {CONTACT.whatsappFormatted}
+          </span>
+        </a>
+        <a href={`tel:${CONTACT.phone}`} className="flex items-center gap-2.5 py-1 text-ink hover:text-orange-ink transition-colors">
+          <Phone className="w-4 h-4 text-orange-ink shrink-0" aria-hidden="true" />
+          <span>
+            <span className="sr-only">Telefone: </span>
+            {CONTACT.phoneFormatted}
           </span>
         </a>
         <a href={`mailto:${CONTACT.email}`} className="flex items-center gap-2.5 py-1 text-ink hover:text-orange-ink transition-colors break-all">

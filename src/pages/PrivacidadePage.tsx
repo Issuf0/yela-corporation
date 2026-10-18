@@ -44,7 +44,7 @@ export const PrivacidadePage: React.FC = () => (
             </li>
             <li>
               <strong>Learn Code</strong>, parceira tecnológica da YELA, apenas quando o seu pedido diz respeito a
-              soluções tecnológicas e a YELA o encaminha para análise técnica, no âmbito da parceria.
+              soluções digitais e a YELA o encaminha para análise técnica, no âmbito da parceria.
             </li>
           </ul>
           <p>

@@ -3,14 +3,17 @@
  * ou quando os contactos da YELA mudarem.
  */
 export const SITE_NAME = 'YELA Corporation';
-export const LEGAL_NAME = 'YELA Corporation, SA';
-export const TAGLINE = 'Arquitectura · Creative Studio · Construções';
+export const LEGAL_NAME = 'YELA Corporation, SU, SAS';
+export const TAGLINE = 'Arquitectura · Construção · Estúdio Criativo';
+export const SLOGAN = 'Transformamos ideias em resultados.';
 
 export const CONTACT = {
   email: 'yelacorp.info@gmail.com',
   whatsappNumber: '+258845306215',
   whatsappFormatted: '+258 84 530 6215',
-  city: 'Maputo',
+  phone: '+258834446767',
+  phoneFormatted: '+258 83 444 6767',
+  city: 'Nampula',
   country: 'Moçambique',
 } as const;
 

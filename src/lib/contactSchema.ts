@@ -12,11 +12,22 @@ export const CONTACT_LIMITS = {
 } as const;
 
 export const CONTACT_SUBJECTS = {
-  arquitectura: 'Arquitectura e construção',
-  creative: 'Creative Studio',
-  tecnologia: 'Soluções tecnológicas (parceria Learn Code)',
+  arquitectura: 'Arquitectura & Construção',
+  branding: 'Branding & Design',
+  marketing: 'Marketing Digital',
+  audiovisual: 'Audiovisual & Multimédia',
+  digital: 'Soluções Digitais (com a Learn Code)',
+  formacao: 'Formação & Consultoria',
   outro: 'Outro assunto',
 } as const;
+
+/** Valores antigos de ?assunto= ainda em circulação. */
+const LEGACY_SUBJECTS: Record<string, ContactSubject> = { tecnologia: 'digital', creative: 'branding' };
+
+export function resolveSubject(value: unknown): ContactSubject | '' {
+  if (isContactSubject(value)) return value;
+  return typeof value === 'string' && value in LEGACY_SUBJECTS ? LEGACY_SUBJECTS[value]! : '';
+}
 
 export type ContactSubject = keyof typeof CONTACT_SUBJECTS;
 

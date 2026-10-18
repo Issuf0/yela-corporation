@@ -50,7 +50,7 @@ describe.each(ALL_PAGES)('page $path', ({ path, element }) => {
 
     for (const a of Array.from(container.querySelectorAll('a[href]'))) {
       const href = a.getAttribute('href')!;
-      if (/^(https?:|mailto:)/.test(href)) continue;
+      if (/^(https?:|mailto:|tel:)/.test(href)) continue;
       const [pathPart, hash] = href.split('#');
       const target = pathPart?.split('?')[0] || '';
       if (target) expect(KNOWN_PATHS.has(target), `unknown page ${href}`).toBe(true);
@@ -99,9 +99,9 @@ describe('navigation config', () => {
   });
 
   it('contact page preselects the subject from ?assunto=', () => {
-    window.history.replaceState({}, '', '/contacto?assunto=tecnologia');
+    window.history.replaceState({}, '', '/contacto?assunto=digital');
     const { container } = render(<ContactoPage />);
-    expect((container.querySelector('select[name="subject"]') as HTMLSelectElement).value).toBe('tecnologia');
+    expect((container.querySelector('select[name="subject"]') as HTMLSelectElement).value).toBe('digital');
     window.history.replaceState({}, '', '/contacto?assunto=invalido');
     cleanup();
     const second = render(<ContactoPage />);

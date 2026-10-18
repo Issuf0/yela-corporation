@@ -8,7 +8,7 @@ const fields: ContactFields = {
   email: 'maria@example.com',
   organization: '',
   phone: '+258 84 000 0000',
-  subject: 'tecnologia',
+  subject: 'digital',
   message: 'Linha 1\nLinha 2',
 };
 
@@ -18,7 +18,7 @@ describe('buildContactMessage', () => {
     expect(text).toContain('*Nome:* Maria Silva');
     expect(text).not.toContain('Organização');
     expect(text).toContain('*Telefone:* +258 84 000 0000');
-    expect(text).toContain('*Assunto:* Soluções tecnológicas (parceria Learn Code)');
+    expect(text).toContain('*Assunto:* Soluções Digitais (com a Learn Code)');
     expect(text).toContain('*Mensagem:*\nLinha 1\nLinha 2');
     expect(text).toContain('_Enviado através do website da YELA Corporation._');
   });
@@ -32,7 +32,7 @@ describe('buildContactMessage', () => {
   });
 
   it('builds the email subject from the chosen topic', () => {
-    expect(buildEmailSubject(fields)).toBe('Contacto via website — Soluções tecnológicas (parceria Learn Code)');
+    expect(buildEmailSubject(fields)).toBe('Contacto via website — Soluções Digitais (com a Learn Code)');
   });
 });
 

@@ -1,4 +1,4 @@
-import { Mail, MessageCircle } from 'lucide-react';
+import { Mail, MessageCircle, Phone } from 'lucide-react';
 import React from 'react';
 import { ContactForm } from '../components/ContactForm';
 import { Container, Layout } from '../components/Layout';
@@ -15,7 +15,7 @@ const SOCIAL_ICONS: Record<(typeof SOCIAL)[number]['name'], React.FC<{ className
 const STEPS = [
   { title: 'Recebemos a sua mensagem', text: 'No WhatsApp ou no email da YELA, consoante o canal que escolher.' },
   { title: 'Respondemos para marcar uma conversa', text: 'Pelo mesmo canal, para perceber o contexto e os objectivos do seu pedido.' },
-  { title: 'Se for tecnológico, envolvemos a Learn Code', text: 'Que faz a análise técnica e prepara a proposta, no âmbito da parceria.' },
+  { title: 'Se for uma solução digital, envolvemos a Learn Code', text: 'Que faz a análise técnica e prepara a proposta, no âmbito da parceria.' },
 ];
 
 const channelClass = 'group flex items-center gap-4 py-4 border-t border-line';
@@ -45,6 +45,15 @@ export const ContactoPage: React.FC = () => (
                 <span className="flex flex-col">
                   <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-3">WhatsApp</span>
                   <span className="text-base text-ink group-hover:text-orange-ink transition-colors">{CONTACT.whatsappFormatted}</span>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href={`tel:${CONTACT.phone}`} className={channelClass}>
+                <Phone className="w-4 h-4 text-orange-ink shrink-0" aria-hidden="true" />
+                <span className="flex flex-col">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-3">Telefone</span>
+                  <span className="text-base text-ink group-hover:text-orange-ink transition-colors">{CONTACT.phoneFormatted}</span>
                 </span>
               </a>
             </li>
