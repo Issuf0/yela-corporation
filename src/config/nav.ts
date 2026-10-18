@@ -15,6 +15,7 @@ export const PAGES: readonly SitePage[] = [
   { path: '/sobre', file: 'sobre.html', label: 'A YELA', inNav: true },
   { path: '/actuacao', file: 'actuacao.html', label: 'Áreas de actuação', inNav: true },
   { path: '/parceria', file: 'parceria.html', label: 'Parceria estratégica', inNav: true },
+  { path: '/parcerias', file: 'parcerias.html', label: 'Parcerias', inNav: true },
   { path: '/contacto', file: 'contacto.html', label: 'Contacto', inNav: true },
   { path: '/privacidade', file: 'privacidade.html', label: 'Privacidade', inNav: false },
 ];
@@ -32,7 +33,7 @@ export function normalisePath(pathname: string): string {
   return path;
 }
 
-/** Página seguinte na ordem editorial (Início → A YELA → Áreas → Parceria → Contacto). */
+/** Página seguinte na ordem editorial (Início → A YELA → Áreas → Parceria → Parcerias → Contacto). */
 export function nextPage(path: string): SitePage | undefined {
   const order = PAGES.filter((p) => p.path !== '/privacidade');
   const index = order.findIndex((p) => p.path === path);

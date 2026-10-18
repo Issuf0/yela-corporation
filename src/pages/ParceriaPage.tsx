@@ -5,6 +5,9 @@ import { Container, Layout } from '../components/Layout';
 import { NextPage } from '../components/NextPage';
 import { PageHero } from '../components/PageHero';
 import { SectionMarker } from '../components/SectionMarker';
+import { PARTNERS } from '../config/site';
+
+const LEARN_CODE = PARTNERS.find((p) => p.name === 'Learn Code')!;
 
 const YELA_ROLE = [
   'Comunicação e marketing',
@@ -138,7 +141,7 @@ export const ParceriaPage: React.FC = () => (
               soluções que desenvolve, nos termos de cada contrato.
             </p>
             <a
-              href="https://learncode.vercel.app"
+              href={LEARN_CODE.url}
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-orange-ink hover:text-navy"

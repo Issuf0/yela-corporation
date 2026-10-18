@@ -93,9 +93,14 @@ export const SobrePage: React.FC = () => (
             e soluções com inteligência artificial. Em parceria desde Setembro de 2026, a Learn Code concebe e executa as
             soluções digitais que a YELA leva aos seus clientes.
           </p>
-          <a href="/parceria" className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-orange-ink hover:text-navy underline underline-offset-4">
-            Ver a parceria em detalhe
-          </a>
+          <div className="flex flex-wrap gap-x-8 gap-y-3">
+            <a href="/parceria" className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-orange-ink hover:text-navy underline underline-offset-4">
+              Ver a parceria em detalhe
+            </a>
+            <a href="/parcerias" className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-orange-ink hover:text-navy underline underline-offset-4">
+              Todos os parceiros
+            </a>
+          </div>
         </div>
       </Container>
     </section>

@@ -2,10 +2,12 @@
 import { cleanup, fireEvent, render, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { NAV_PAGES, PAGES, nextPage, normalisePath } from '../src/config/nav';
+import { PARTNERS } from '../src/config/site';
 import { ActuacaoPage } from '../src/pages/ActuacaoPage';
 import { ContactoPage } from '../src/pages/ContactoPage';
 import { HomePage } from '../src/pages/HomePage';
 import { ParceriaPage } from '../src/pages/ParceriaPage';
+import { ParceriasPage } from '../src/pages/ParceriasPage';
 import { PrivacidadePage } from '../src/pages/PrivacidadePage';
 import { SobrePage } from '../src/pages/SobrePage';
 
@@ -16,6 +18,7 @@ const ALL_PAGES = [
   { path: '/sobre', element: <SobrePage /> },
   { path: '/actuacao', element: <ActuacaoPage /> },
   { path: '/parceria', element: <ParceriaPage /> },
+  { path: '/parcerias', element: <ParceriasPage /> },
   { path: '/contacto', element: <ContactoPage /> },
   { path: '/privacidade', element: <PrivacidadePage /> },
 ];
@@ -74,7 +77,8 @@ describe('navigation config', () => {
   it('orders the editorial "next" links and normalises paths', () => {
     expect(nextPage('/')?.path).toBe('/sobre');
     expect(nextPage('/sobre')?.path).toBe('/actuacao');
-    expect(nextPage('/parceria')?.path).toBe('/contacto');
+    expect(nextPage('/parceria')?.path).toBe('/parcerias');
+    expect(nextPage('/parcerias')?.path).toBe('/contacto');
     expect(nextPage('/contacto')).toBeUndefined();
     expect(normalisePath('/sobre.html')).toBe('/sobre');
     expect(normalisePath('/index.html')).toBe('/');
@@ -103,6 +107,31 @@ describe('navigation config', () => {
     const second = render(<ContactoPage />);
     expect((second.container.querySelector('select[name="subject"]') as HTMLSelectElement).value).toBe('');
     window.history.replaceState({}, '', '/');
+  });
+
+  it('partners page lists every configured partner with an external link', () => {
+    const { container } = render(<ParceriasPage />);
+    for (const partner of PARTNERS) {
+      expect(container.textContent).toContain(partner.name);
+      const link = container.querySelector(`a[href="${partner.url}"]`);
+      expect(link, `missing link for ${partner.name}`).toBeTruthy();
+      expect(link!.getAttribute('rel')).toContain('noopener');
+    }
+    expect(container.querySelector('a[href="https://www.facebook.com/oholopodcast"]')).toBeTruthy();
+    expect(container.querySelector('a[href="https://learn-code-ruddy.vercel.app/"]')).toBeTruthy();
+  });
+
+  it('contact page and footer link to Instagram and Facebook with an icon', () => {
+    const { container } = render(<ContactoPage />);
+    for (const url of ['https://www.instagram.com/yela_corporation', 'https://www.facebook.com/yelacorporation']) {
+      const links = Array.from(container.querySelectorAll(`a[href="${url}"]`));
+      expect(links.length, `missing link ${url}`).toBe(2);
+      for (const link of links) {
+        expect(link.querySelector('svg[aria-hidden="true"]')).toBeTruthy();
+        expect(link.getAttribute('rel')).toContain('noopener');
+      }
+    }
+    expect(container.querySelector('footer a[aria-label="Instagram da YELA Corporation"]')).toBeTruthy();
   });
 
   it('privacy page mentions the real channels and never a mail provider', () => {
