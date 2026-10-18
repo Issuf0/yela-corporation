@@ -1,6 +1,5 @@
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
-import { CONTACT, whatsappHref } from '../config/site';
 import { Container } from './Layout';
 
 interface CtaBandProps {
@@ -25,7 +24,7 @@ export const CtaBand: React.FC<CtaBandProps> = ({
         </h2>
         <p className="mt-4 text-base sm:text-lg text-ink-2 font-light leading-relaxed max-w-xl text-pretty">{text}</p>
       </div>
-      <div className="lg:col-span-4 flex flex-col items-start lg:items-end gap-4">
+      <div className="lg:col-span-4 flex lg:justify-end">
         <a
           href={href}
           className="group inline-flex items-center gap-3 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors"
@@ -33,15 +32,6 @@ export const CtaBand: React.FC<CtaBandProps> = ({
           <span>{action}</span>
           <ArrowRight className="w-4 h-4 text-orange motion-safe:transition-transform motion-safe:group-hover:translate-x-1" aria-hidden="true" />
         </a>
-        <p className="text-sm text-ink-3">
-          <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className="hover:text-ink underline underline-offset-4">
-            {CONTACT.whatsappFormatted}
-          </a>
-          <span aria-hidden="true"> · </span>
-          <a href={`mailto:${CONTACT.email}`} className="hover:text-ink underline underline-offset-4">
-            {CONTACT.email}
-          </a>
-        </p>
       </div>
     </Container>
   </section>
