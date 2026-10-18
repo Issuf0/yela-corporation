@@ -1,19 +1,9 @@
 import React from 'react';
+import { NAV_PAGES } from '../config/nav';
 import { CONTACT, LEGAL_NAME, TAGLINE, whatsappHref } from '../config/site';
 import { Monogram } from './Logo';
 
-interface FooterProps {
-  homePath?: '' | '/';
-}
-
-const LINKS = [
-  { href: '#apresentacao', label: 'A YELA' },
-  { href: '#actuacao', label: 'Actuação' },
-  { href: '#parceria', label: 'Parceria' },
-  { href: '#contacto', label: 'Contacto' },
-] as const;
-
-export const Footer: React.FC<FooterProps> = ({ homePath = '' }) => (
+export const Footer: React.FC = () => (
   <footer className="border-t border-line py-10 sm:py-12 text-ink-3 text-xs">
     <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-6 items-start">
       <div className="md:col-span-5 flex items-start gap-3">
@@ -37,13 +27,16 @@ export const Footer: React.FC<FooterProps> = ({ homePath = '' }) => (
         </a>
       </div>
 
-      <nav aria-label="Navegação do rodapé" className="md:col-span-4 md:justify-self-end flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em]">
-        {LINKS.map((link) => (
-          <a key={link.href} href={`${homePath}${link.href}`} className="py-2 hover:text-ink transition-colors">
-            {link.label}
+      <nav aria-label="Navegação do rodapé" className="md:col-span-4 md:justify-self-end grid grid-cols-2 gap-x-8 gap-y-1 font-mono text-[11px] uppercase tracking-[0.14em]">
+        <a href="/" className="py-1.5 hover:text-ink transition-colors">
+          Início
+        </a>
+        {NAV_PAGES.map((page) => (
+          <a key={page.path} href={page.path} className="py-1.5 hover:text-ink transition-colors">
+            {page.label}
           </a>
         ))}
-        <a href="/privacidade" className="py-2 hover:text-ink transition-colors">
+        <a href="/privacidade" className="py-1.5 hover:text-ink transition-colors">
           Privacidade
         </a>
       </nav>

@@ -1,8 +1,7 @@
 import React from 'react';
+import { Container, Layout } from '../components/Layout';
+import { PageHero } from '../components/PageHero';
 import { CONTACT, LEGAL_NAME } from '../config/site';
-import { Footer } from './Footer';
-import { Header } from './Header';
-import { SectionMarker } from './SectionMarker';
 
 const Pending: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span className="font-mono text-[0.8em] uppercase tracking-wider text-orange-ink">[{children}]</span>
@@ -12,21 +11,17 @@ const H2: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <h2 className="font-display text-xl sm:text-2xl font-bold text-ink tracking-tight mt-12 mb-4 first:mt-0">{children}</h2>
 );
 
-export const PrivacyPage: React.FC = () => (
-  <div className="min-h-dvh flex flex-col bg-paper text-ink">
-    <Header homePath="/" />
-    <main id="conteudo" className="flex-1 pt-32 pb-20 sm:pt-40 sm:pb-28">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        <SectionMarker number="§" label="Privacidade" className="mb-6" />
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-ink text-balance max-w-3xl">
-          Política de privacidade
-        </h1>
-        <p className="mt-4 text-base sm:text-lg text-ink-2 font-light leading-relaxed max-w-2xl text-pretty">
-          Esta página explica, de forma directa, como o website da YELA Corporation lida com os dados que nos envia e
-          como pode exercer os seus direitos.
-        </p>
-
-        <div className="mt-12 max-w-2xl text-base text-ink-2 font-light leading-relaxed space-y-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_strong]:font-semibold [&_strong]:text-ink">
+export const PrivacidadePage: React.FC = () => (
+  <Layout path="/privacidade">
+    <PageHero
+      number="§"
+      label="Privacidade"
+      title="Política de privacidade"
+      lede="Como o website da YELA Corporation lida com os dados que nos envia e como pode exercer os seus direitos."
+    />
+    <section className="pb-20 sm:pb-28" aria-label="Texto da política de privacidade">
+      <Container>
+        <div className="max-w-2xl text-base text-ink-2 font-light leading-relaxed space-y-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_strong]:font-semibold [&_strong]:text-ink">
           <H2>1. Responsável pelo tratamento</H2>
           <p>
             <strong>{LEGAL_NAME}</strong>, com sede em {CONTACT.city}, {CONTACT.country}.{' '}
@@ -36,9 +31,9 @@ export const PrivacyPage: React.FC = () => (
           <H2>2. O que o website recolhe</H2>
           <p>
             <strong>Nada.</strong> O website não tem base de dados, não guarda formulários e não envia dados para
-            servidores. O formulário de contacto apenas prepara uma mensagem com o que escreveu (nome, email,
-            organização e telefone opcionais, assunto e mensagem) e abre-a no seu WhatsApp ou no seu programa de email.
-            É você que decide enviá-la.
+            servidores. O formulário de contacto apenas prepara uma mensagem com o que escreveu (nome, email, organização
+            e telefone opcionais, assunto e mensagem) e abre-a no seu WhatsApp ou no seu programa de email. É você que
+            decide enviá-la.
           </p>
 
           <H2>3. Quem recebe a sua mensagem</H2>
@@ -93,8 +88,7 @@ export const PrivacyPage: React.FC = () => (
 
           <p className="pt-6 text-sm text-ink-3">Última actualização: Outubro de 2026.</p>
         </div>
-      </div>
-    </main>
-    <Footer homePath="/" />
-  </div>
+      </Container>
+    </section>
+  </Layout>
 );

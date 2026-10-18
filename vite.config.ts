@@ -1,13 +1,9 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
-import { seoPlugin, type SeoPage } from './build/seoPlugin';
-
-/** Páginas públicas do site: usadas no canonical, og:url e sitemap. */
-const PAGES: SeoPage[] = [
-  { file: 'index.html', path: '/' },
-  { file: 'privacidade.html', path: '/privacidade' },
-];
+import { cleanUrlsPlugin } from './build/cleanUrlsPlugin';
+import { seoPlugin } from './build/seoPlugin';
+import { PAGES } from './src/config/nav';
 
 export default defineConfig(({ mode }) => {
   // SITE_URL é lida em tempo de build; nada daqui chega ao browser.
@@ -15,12 +11,12 @@ export default defineConfig(({ mode }) => {
   const siteUrl = (env.SITE_URL ?? '').trim().replace(/\/+$/, '');
 
   return {
-    plugins: [react(), tailwindcss(), seoPlugin({ siteUrl, pages: PAGES })],
+    plugins: [react(), tailwindcss(), cleanUrlsPlugin(), seoPlugin({ siteUrl, pages: PAGES })],
     build: {
       rolldownOptions: {
         input: {
-          index: 'index.html',
-          privacidade: 'privacidade.html',
+          ...Object.fromEntries(PAGES.map((p) => [p.file.replace(/\.html$/, ''), p.file])),
+          notFound: '404.html',
         },
       },
     },

@@ -10,7 +10,7 @@ export interface SeoPage {
 export interface SeoPluginOptions {
   /** Absolute production origin without trailing slash, or "" when not yet known. */
   siteUrl: string;
-  pages: SeoPage[];
+  pages: readonly SeoPage[];
 }
 
 /**

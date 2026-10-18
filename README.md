@@ -14,15 +14,20 @@ Direcção visual: **YELA — Quiet Impact** (editorial, contido, fundos off-whi
 ## Estrutura
 
 ```
-index.html, privacidade.html   páginas (build multi-página do Vite)
-src/main.tsx, src/privacy.tsx  pontos de entrada
-src/App.tsx                    homepage: Header, Hero, A YELA, Áreas, Parceria, Contacto, Footer
-src/components/                componentes (ContactForm, Logo, PrivacyPage, ...)
+*.html                         uma página por ficheiro (build multi-página do Vite): index, sobre,
+                               actuacao, parceria, contacto, privacidade, 404
+src/entries/*.tsx              ponto de entrada de cada página (monta a página respectiva)
+src/pages/*.tsx                HomePage, SobrePage, ActuacaoPage, ParceriaPage, ContactoPage,
+                               PrivacidadePage, NotFoundPage
+src/components/                Layout, Header (página actual com aria-current), Footer, PageHero,
+                               CtaBand, NextPage, ContactForm, Logo, SectionMarker
+src/config/nav.ts              lista de páginas (caminho, ficheiro, rótulo) — fonte única da navegação
 src/config/site.ts             contactos (WhatsApp, email), nome legal, tagline — alterar aqui
 src/lib/contactSchema.ts       validação partilhada do formulário (limites, mensagens em PT)
 src/lib/contactMessage.ts      texto da mensagem enviada por WhatsApp/email
 src/index.css                  tokens de design (@theme) e estilos base
 build/seoPlugin.ts             canonical, og:url, og:image, robots.txt e sitemap.xml (depende de SITE_URL)
+build/cleanUrlsPlugin.ts       em dev/preview serve /sobre como sobre.html (como o cleanUrls da Vercel)
 public/                        favicon.svg/.ico, apple-touch-icon.png, og-image.png
 tests/                         vitest
 vercel.json                    cabeçalhos de segurança, cache, cleanUrls
@@ -72,7 +77,8 @@ A conta Vercel e o domínio devem pertencer à YELA Corporation (acordo, cláusu
 
 ### Verificação após deploy
 
-- [ ] `/` e `/privacidade` abrem; `/robots.txt`, `/favicon.svg`, `/og-image.png` respondem.
+- [ ] `/`, `/sobre`, `/actuacao`, `/parceria`, `/contacto` e `/privacidade` abrem; um endereço inexistente mostra a página 404; `/robots.txt`, `/favicon.svg`, `/og-image.png` respondem.
+- [ ] `/contacto?assunto=tecnologia` abre o formulário com o assunto já seleccionado.
 - [ ] Preencher o formulário com dados inválidos mostra erros em português; com dados válidos aparece «Escolha como enviar».
 - [ ] «Enviar pelo WhatsApp» abre `wa.me/258845306215` com a mensagem; «Enviar por email» abre o programa de email para `yelacorp.info@gmail.com`.
 - [ ] Menu móvel abre/fecha (botão, Escape) num telemóvel.

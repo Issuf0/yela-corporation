@@ -1,20 +1,13 @@
 import { Menu, X } from 'lucide-react';
 import React, { useEffect, useId, useState } from 'react';
+import { NAV_PAGES } from '../config/nav';
 import { Wordmark } from './Logo';
 
 interface HeaderProps {
-  /** '' on the homepage; '/' on secondary pages so anchors point back home. */
-  homePath?: '' | '/';
+  currentPath: string;
 }
 
-const NAV_ITEMS = [
-  { href: '#apresentacao', label: 'A YELA' },
-  { href: '#actuacao', label: 'Áreas de actuação' },
-  { href: '#parceria', label: 'Parceria estratégica' },
-  { href: '#contacto', label: 'Contacto' },
-] as const;
-
-export const Header: React.FC<HeaderProps> = ({ homePath = '' }) => {
+export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const drawerId = useId();
@@ -44,8 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ homePath = '' }) => {
     };
   }, [menuOpen]);
 
-  const linkClass =
-    'hover:text-ink transition-colors whitespace-nowrap py-2 -my-2 rounded-sm';
+  const isCurrent = (path: string) => path === currentPath;
   const ctaClass =
     'inline-flex items-center justify-center min-h-11 px-5 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors whitespace-nowrap';
 
@@ -66,20 +58,29 @@ export const Header: React.FC<HeaderProps> = ({ homePath = '' }) => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex items-center justify-between gap-6">
-          <a href={homePath || '/'} className="shrink-0 rounded-sm" aria-label="YELA Corporation — página inicial">
+          <a href="/" className="shrink-0 rounded-sm" aria-label="YELA Corporation — página inicial" aria-current={isCurrent('/') ? 'page' : undefined}>
             <Wordmark />
           </a>
 
           <nav aria-label="Navegação principal" className="hidden md:flex items-center gap-7 text-sm font-medium tracking-wide text-ink-2">
-            {NAV_ITEMS.map((item) => (
-              <a key={item.href} href={`${homePath}${item.href}`} className={linkClass}>
-                {item.label}
+            {NAV_PAGES.map((page) => (
+              <a
+                key={page.path}
+                href={page.path}
+                aria-current={isCurrent(page.path) ? 'page' : undefined}
+                className={`relative py-2 -my-2 rounded-sm whitespace-nowrap transition-colors hover:text-ink ${
+                  isCurrent(page.path)
+                    ? 'text-ink after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-px after:bg-orange'
+                    : ''
+                }`}
+              >
+                {page.label}
               </a>
             ))}
           </nav>
 
           <div className="hidden md:flex items-center shrink-0">
-            <a href={`${homePath}#contacto`} className={ctaClass}>
+            <a href="/contacto" className={ctaClass}>
               Fale connosco
             </a>
           </div>
@@ -96,23 +97,22 @@ export const Header: React.FC<HeaderProps> = ({ homePath = '' }) => {
           </button>
         </div>
 
-        <div
-          id={drawerId}
-          hidden={!menuOpen}
-          className="md:hidden bg-paper border-t border-line-soft px-5 pt-2 pb-6"
-        >
+        <div id={drawerId} hidden={!menuOpen} className="md:hidden bg-paper border-t border-line-soft px-5 pt-2 pb-6">
           <nav aria-label="Navegação principal (móvel)" className="flex flex-col text-base font-medium text-ink">
-            {NAV_ITEMS.map((item) => (
+            <a href="/" aria-current={isCurrent('/') ? 'page' : undefined} className="py-3.5 border-b border-line-soft hover:text-orange-ink">
+              Início
+            </a>
+            {NAV_PAGES.map((page) => (
               <a
-                key={item.href}
-                href={`${homePath}${item.href}`}
-                onClick={() => setMenuOpen(false)}
-                className="py-3.5 border-b border-line-soft hover:text-orange-ink"
+                key={page.path}
+                href={page.path}
+                aria-current={isCurrent(page.path) ? 'page' : undefined}
+                className={`py-3.5 border-b border-line-soft hover:text-orange-ink ${isCurrent(page.path) ? 'text-orange-ink' : ''}`}
               >
-                {item.label}
+                {page.label}
               </a>
             ))}
-            <a href={`${homePath}#contacto`} onClick={() => setMenuOpen(false)} className={`${ctaClass} mt-5 w-full`}>
+            <a href="/contacto" className={`${ctaClass} mt-5 w-full`}>
               Fale connosco
             </a>
           </nav>

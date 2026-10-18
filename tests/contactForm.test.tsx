@@ -1,18 +1,33 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ContactForm } from '../src/components/ContactForm';
+import * as openLink from '../src/lib/openLink';
 
+const open = vi.spyOn(openLink, 'openChannel');
+
+beforeEach(() => {
+  open.mockReset();
+  open.mockImplementation(() => {});
+});
 afterEach(cleanup);
 
 function fill(label: RegExp, value: string) {
   fireEvent.change(screen.getByLabelText(label), { target: { value } });
 }
 
+function fillValid() {
+  fill(/nome completo/i, '  Maria   Silva ');
+  fill(/^email/i, 'Maria@Example.com');
+  fill(/telefone/i, '+258 84 000 0000');
+  fireEvent.change(screen.getByLabelText(/assunto/i), { target: { value: 'tecnologia' } });
+  fill(/mensagem/i, 'Precisamos de um sistema de gestão para a nossa clínica.');
+}
+
 describe('ContactForm — visitor journey', () => {
-  it('shows Portuguese errors, focuses the first invalid field and sends nothing', () => {
+  it('shows Portuguese errors, focuses the first invalid field and opens nothing', () => {
     render(<ContactForm />);
-    fireEvent.click(screen.getByRole('button', { name: /preparar mensagem/i }));
+    fireEvent.click(screen.getByRole('button', { name: /enviar pelo whatsapp/i }));
 
     expect(screen.getByText('Indique o seu nome completo.')).toBeTruthy();
     expect(screen.getByText('Indique o seu endereço de email.')).toBeTruthy();
@@ -23,68 +38,70 @@ describe('ContactForm — visitor journey', () => {
     expect(name.getAttribute('aria-invalid')).toBe('true');
     expect(document.activeElement).toBe(name);
     expect(name.getAttribute('aria-describedby')).toBe(screen.getByText('Indique o seu nome completo.').id);
-    expect(screen.queryByRole('link', { name: /whatsapp/i })).toBeNull();
+    expect(open).not.toHaveBeenCalled();
   });
 
-  it('clears a field error as soon as the visitor edits that field', () => {
+  it('clears a field error as soon as the visitor edits that field and counts message characters', () => {
     render(<ContactForm />);
-    fireEvent.click(screen.getByRole('button', { name: /preparar mensagem/i }));
+    fireEvent.click(screen.getByRole('button', { name: /enviar por email/i }));
     fill(/nome completo/i, 'Maria Silva');
     expect(screen.queryByText('Indique o seu nome completo.')).toBeNull();
     expect(screen.getByText('Indique o seu endereço de email.')).toBeTruthy();
+    fill(/mensagem/i, 'Olá');
+    expect(screen.getByText('3 / 3000')).toBeTruthy();
   });
 
-  it('prepares WhatsApp and email links with the normalised message and keeps the data when editing', () => {
+  it('opens WhatsApp with the normalised message and shows the confirmation with the email alternative', () => {
     render(<ContactForm />);
-    fill(/nome completo/i, '  Maria   Silva ');
-    fill(/^email/i, 'Maria@Example.com');
-    fill(/telefone/i, '+258 84 000 0000');
-    fireEvent.change(screen.getByLabelText(/assunto/i), { target: { value: 'tecnologia' } });
-    fill(/mensagem/i, 'Precisamos de um sistema de gestão para a nossa clínica.');
-    fireEvent.click(screen.getByRole('button', { name: /preparar mensagem/i }));
+    fillValid();
+    fireEvent.click(screen.getByRole('button', { name: /enviar pelo whatsapp/i }));
 
-    expect(screen.getByRole('heading', { name: /escolha como enviar/i })).toBeTruthy();
-    expect(screen.getByText('Maria Silva')).toBeTruthy();
-
-    const whatsapp = screen.getByRole('link', { name: /enviar pelo whatsapp/i });
-    const href = whatsapp.getAttribute('href') ?? '';
+    expect(open).toHaveBeenCalledTimes(1);
+    const [href, channel] = open.mock.calls[0]!;
+    expect(channel).toBe('whatsapp');
     expect(href.startsWith('https://wa.me/258845306215?text=')).toBe(true);
     const text = decodeURIComponent(href.split('text=')[1] ?? '');
     expect(text).toContain('*Nome:* Maria Silva');
     expect(text).toContain('*Email:* maria@example.com');
     expect(text).toContain('*Assunto:* Soluções tecnológicas (parceria Learn Code)');
     expect(text).toContain('Precisamos de um sistema de gestão');
-    expect(whatsapp.getAttribute('target')).toBe('_blank');
-    expect(whatsapp.getAttribute('rel')).toContain('noopener');
 
-    const email = screen.getByRole('link', { name: /enviar por email/i });
-    const mailto = email.getAttribute('href') ?? '';
-    expect(mailto.startsWith('mailto:yelacorp.info@gmail.com?')).toBe(true);
-    expect(decodeURIComponent(mailto)).toContain('subject=Contacto via website — Soluções tecnológicas');
-    expect(decodeURIComponent(mailto)).not.toContain('*Nome:*');
-
-    fireEvent.click(screen.getByRole('button', { name: /editar mensagem/i }));
-    expect((screen.getByLabelText(/nome completo/i) as HTMLInputElement).value).toBe('  Maria   Silva ');
-    expect((screen.getByLabelText(/mensagem/i) as HTMLTextAreaElement).value).toContain('clínica');
+    expect(screen.getByRole('heading', { name: /mensagem aberta no whatsapp/i })).toBeTruthy();
+    const alt = screen.getByRole('link', { name: /enviar por email/i });
+    expect(alt.getAttribute('href')?.startsWith('mailto:yelacorp.info@gmail.com?')).toBe(true);
+    expect(decodeURIComponent(alt.getAttribute('href') ?? '')).not.toContain('*Nome:*');
   });
 
-  it('confirms the chosen channel and offers the alternative, then resets', () => {
+  it('opens the email client with subject and body', () => {
     render(<ContactForm />);
-    fill(/nome completo/i, 'Maria Silva');
-    fill(/^email/i, 'maria@example.com');
-    fireEvent.change(screen.getByLabelText(/assunto/i), { target: { value: 'arquitectura' } });
-    fill(/mensagem/i, 'Queremos renovar a fachada do nosso edifício.');
-    fireEvent.click(screen.getByRole('button', { name: /preparar mensagem/i }));
+    fillValid();
+    fireEvent.click(screen.getByRole('button', { name: /enviar por email/i }));
 
-    const whatsapp = screen.getByRole('link', { name: /enviar pelo whatsapp/i });
-    whatsapp.addEventListener('click', (event) => event.preventDefault());
-    fireEvent.click(whatsapp);
+    const [href, channel] = open.mock.calls[0]!;
+    expect(channel).toBe('email');
+    expect(decodeURIComponent(href)).toContain('subject=Contacto via website — Soluções tecnológicas');
+    expect(decodeURIComponent(href)).toContain('Nome: Maria Silva');
+    expect(screen.getByRole('heading', { name: /mensagem aberta no seu email/i })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /enviar pelo whatsapp/i }).getAttribute('target')).toBe('_blank');
+  });
 
-    expect(screen.getByRole('heading', { name: /mensagem preparada/i })).toBeTruthy();
-    expect(screen.getByText(/abriu no whatsapp da yela corporation/i)).toBeTruthy();
-    expect(screen.getByRole('link', { name: /enviar por email/i })).toBeTruthy();
+  it('keeps the data when going back and clears it on "Nova mensagem"', () => {
+    render(<ContactForm />);
+    fillValid();
+    fireEvent.click(screen.getByRole('button', { name: /enviar pelo whatsapp/i }));
 
+    fireEvent.click(screen.getByRole('button', { name: /voltar ao formulário/i }));
+    expect((screen.getByLabelText(/nome completo/i) as HTMLInputElement).value).toBe('  Maria   Silva ');
+    expect((screen.getByLabelText(/mensagem/i) as HTMLTextAreaElement).value).toContain('clínica');
+
+    fireEvent.click(screen.getByRole('button', { name: /enviar pelo whatsapp/i }));
     fireEvent.click(screen.getByRole('button', { name: /nova mensagem/i }));
     expect((screen.getByLabelText(/nome completo/i) as HTMLInputElement).value).toBe('');
+    expect((screen.getByLabelText(/assunto/i) as HTMLSelectElement).value).toBe('');
+  });
+
+  it('honours the preselected subject', () => {
+    render(<ContactForm initialSubject="arquitectura" />);
+    expect((screen.getByLabelText(/assunto/i) as HTMLSelectElement).value).toBe('arquitectura');
   });
 });

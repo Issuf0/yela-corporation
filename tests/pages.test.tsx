@@ -1,45 +1,65 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import App from '../src/App';
-import { PrivacyPage } from '../src/components/PrivacyPage';
+import { NAV_PAGES, PAGES, nextPage, normalisePath } from '../src/config/nav';
+import { ActuacaoPage } from '../src/pages/ActuacaoPage';
+import { ContactoPage } from '../src/pages/ContactoPage';
+import { HomePage } from '../src/pages/HomePage';
+import { ParceriaPage } from '../src/pages/ParceriaPage';
+import { PrivacidadePage } from '../src/pages/PrivacidadePage';
+import { SobrePage } from '../src/pages/SobrePage';
 
 afterEach(cleanup);
+
+const ALL_PAGES = [
+  { path: '/', element: <HomePage /> },
+  { path: '/sobre', element: <SobrePage /> },
+  { path: '/actuacao', element: <ActuacaoPage /> },
+  { path: '/parceria', element: <ParceriaPage /> },
+  { path: '/contacto', element: <ContactoPage /> },
+  { path: '/privacidade', element: <PrivacidadePage /> },
+];
 
 function headingLevels(container: HTMLElement): number[] {
   return Array.from(container.querySelectorAll('h1, h2, h3, h4, h5, h6')).map((h) => Number(h.tagName[1]));
 }
 
-describe('page structure and accessibility basics', () => {
-  it('homepage has one h1, a sane heading sequence, landmarks and a skip link', () => {
-    const { container } = render(<App />);
+const KNOWN_PATHS = new Set(PAGES.map((p) => p.path));
+
+describe.each(ALL_PAGES)('page $path', ({ path, element }) => {
+  it('has exactly one h1, no skipped heading levels, landmarks and a skip link', () => {
+    const { container } = render(element);
     const levels = headingLevels(container);
     expect(levels.filter((l) => l === 1)).toHaveLength(1);
     expect(levels[0]).toBe(1);
-    for (let i = 1; i < levels.length; i += 1) {
-      expect(levels[i]! - levels[i - 1]!).toBeLessThanOrEqual(1); // no skipped levels going down
-    }
+    for (let i = 1; i < levels.length; i += 1) expect(levels[i]! - levels[i - 1]!).toBeLessThanOrEqual(1);
     expect(container.querySelector('main#conteudo')).toBeTruthy();
     expect(container.querySelector('header')).toBeTruthy();
     expect(container.querySelector('footer')).toBeTruthy();
-    const skip = container.querySelector('a[href="#conteudo"]');
-    expect(skip?.textContent).toMatch(/saltar para o conteúdo/i);
+    expect(container.querySelector('a[href="#conteudo"]')?.textContent).toMatch(/saltar para o conteúdo/i);
   });
 
-  it('every navigation anchor on the homepage points to an existing section', () => {
-    const { container } = render(<App />);
-    const targets = Array.from(container.querySelectorAll('a[href^="#"]')).map((a) => a.getAttribute('href')!.slice(1));
-    expect(targets.length).toBeGreaterThan(5);
-    for (const id of new Set(targets)) {
-      expect(container.querySelector(`#${CSS.escape(id)}`), `missing #${id}`).toBeTruthy();
+  it('marks the current page in the navigation and links only to existing pages/anchors', () => {
+    const { container } = render(element);
+    const current = Array.from(container.querySelectorAll('header a[aria-current="page"]'));
+    if (NAV_PAGES.some((p) => p.path === path) || path === '/') expect(current.length).toBeGreaterThan(0);
+    for (const a of current) expect(a.getAttribute('href')).toBe(path);
+
+    for (const a of Array.from(container.querySelectorAll('a[href]'))) {
+      const href = a.getAttribute('href')!;
+      if (/^(https?:|mailto:)/.test(href)) continue;
+      const [pathPart, hash] = href.split('#');
+      const target = pathPart?.split('?')[0] || '';
+      if (target) expect(KNOWN_PATHS.has(target), `unknown page ${href}`).toBe(true);
+      if (hash && !target) expect(container.querySelector(`#${CSS.escape(hash)}`), `missing #${hash}`).toBeTruthy();
     }
   });
 
-  it('every form control has an associated label and every image/svg is labelled or decorative', () => {
-    const { container } = render(<App />);
+  it('labels every form control and marks every svg as decorative or labelled', () => {
+    const { container } = render(element);
     for (const control of Array.from(container.querySelectorAll('input, select, textarea'))) {
       const id = control.getAttribute('id');
-      expect(id, 'control without id').toBeTruthy();
+      expect(id).toBeTruthy();
       expect(container.querySelector(`label[for="${id}"]`), `no label for #${id}`).toBeTruthy();
     }
     for (const svg of Array.from(container.querySelectorAll('svg'))) {
@@ -48,28 +68,47 @@ describe('page structure and accessibility basics', () => {
       expect(decorative || Boolean(labelled)).toBe(true);
     }
   });
+});
 
-  it('mobile menu button exposes expanded state and controls the drawer', () => {
-    const { container } = render(<App />);
+describe('navigation config', () => {
+  it('orders the editorial "next" links and normalises paths', () => {
+    expect(nextPage('/')?.path).toBe('/sobre');
+    expect(nextPage('/sobre')?.path).toBe('/actuacao');
+    expect(nextPage('/parceria')?.path).toBe('/contacto');
+    expect(nextPage('/contacto')).toBeUndefined();
+    expect(normalisePath('/sobre.html')).toBe('/sobre');
+    expect(normalisePath('/index.html')).toBe('/');
+    expect(normalisePath('/parceria/')).toBe('/parceria');
+  });
+
+  it('mobile menu button exposes expanded state, opens the drawer and closes on Escape', () => {
+    const { container } = render(<HomePage />);
     const button = within(container.querySelector('header')!).getByRole('button', { name: /abrir menu/i });
     expect(button.getAttribute('aria-expanded')).toBe('false');
-    const drawerId = button.getAttribute('aria-controls')!;
-    const drawer = container.querySelector(`[id="${drawerId}"]`)!;
+    const drawer = container.querySelector(`[id="${button.getAttribute('aria-controls')}"]`)!;
     expect(drawer.hasAttribute('hidden')).toBe(true);
     fireEvent.click(button);
     expect(button.getAttribute('aria-expanded')).toBe('true');
-    expect(button.getAttribute('aria-label')).toMatch(/fechar menu/i);
     expect(drawer.hasAttribute('hidden')).toBe(false);
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(drawer.hasAttribute('hidden')).toBe(true);
   });
 
-  it('privacy page has its own h1 and links back to the homepage sections', () => {
-    const { container } = render(<PrivacyPage />);
-    expect(headingLevels(container)[0]).toBe(1);
-    expect(container.querySelector('h1')?.textContent).toMatch(/política de privacidade/i);
-    expect(container.querySelector('a[href="/#contacto"]')).toBeTruthy();
+  it('contact page preselects the subject from ?assunto=', () => {
+    window.history.replaceState({}, '', '/contacto?assunto=tecnologia');
+    const { container } = render(<ContactoPage />);
+    expect((container.querySelector('select[name="subject"]') as HTMLSelectElement).value).toBe('tecnologia');
+    window.history.replaceState({}, '', '/contacto?assunto=invalido');
+    cleanup();
+    const second = render(<ContactoPage />);
+    expect((second.container.querySelector('select[name="subject"]') as HTMLSelectElement).value).toBe('');
+    window.history.replaceState({}, '', '/');
+  });
+
+  it('privacy page mentions the real channels and never a mail provider', () => {
+    const { container } = render(<PrivacidadePage />);
     expect(container.textContent).toContain('yelacorp.info@gmail.com');
+    expect(container.textContent).toContain('+258 84 530 6215');
     expect(container.textContent).not.toMatch(/resend/i);
   });
 });

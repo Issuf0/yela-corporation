@@ -7,14 +7,15 @@ import {
   CONTACT_SUBJECT_KEYS,
   CONTACT_SUBJECTS,
   hasErrors,
+  isContactSubject,
   normaliseContactInput,
   validateContactFields,
   type ContactFieldErrors,
   type ContactFieldName,
   type ContactFields,
 } from '../lib/contactSchema';
+import { openChannel } from '../lib/openLink';
 
-type Stage = 'editing' | 'ready' | 'opened';
 type Channel = 'whatsapp' | 'email';
 
 interface FormValues {
@@ -29,29 +30,44 @@ interface FormValues {
 const EMPTY: FormValues = { name: '', email: '', organization: '', phone: '', subject: '', message: '' };
 
 const inputClass =
-  'w-full px-0 py-2.5 text-base sm:text-[15px] bg-transparent border-0 border-b border-ink/30 rounded-none focus:border-navy focus:outline-none focus-visible:outline-none transition-colors text-ink';
+  'w-full px-0 py-2.5 text-base sm:text-[15px] bg-transparent border-0 border-b border-ink/30 rounded-none focus:border-navy focus:outline-none focus-visible:outline-none transition-colors text-ink placeholder:text-ink-3/60';
 const inputErrorClass = 'border-red-700 focus:border-red-700';
 const labelClass = 'block font-mono text-xs uppercase tracking-[0.16em] text-ink-2 mb-1.5';
 const primaryButton =
-  'inline-flex items-center justify-center gap-2.5 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors';
+  'inline-flex items-center justify-center gap-2.5 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors whitespace-nowrap';
 const secondaryButton =
-  'inline-flex items-center justify-center gap-2.5 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-ink border border-ink/40 hover:border-ink hover:bg-paper-deep transition-colors';
+  'inline-flex items-center justify-center gap-2.5 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-ink border border-ink/40 hover:border-ink hover:bg-paper-deep transition-colors whitespace-nowrap';
 const textLink =
   'inline-flex min-h-11 items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-orange-ink hover:text-navy underline underline-offset-4';
 
-export const ContactForm: React.FC = () => {
+interface ContactFormProps {
+  /** Assunto pré-seleccionado (ex.: vindo de ?assunto=tecnologia). */
+  initialSubject?: string;
+}
+
+/** Ligações prontas para cada canal, a partir dos campos já normalizados. */
+function channelLinks(fields: ContactFields) {
+  return {
+    whatsapp: whatsappHref(buildContactMessage(fields, 'whatsapp')),
+    email: mailtoHref(buildEmailSubject(fields), buildContactMessage(fields, 'email')),
+  };
+}
+
+export const ContactForm: React.FC<ContactFormProps> = ({ initialSubject = '' }) => {
   const baseId = useId();
-  const [values, setValues] = useState<FormValues>(EMPTY);
+  const [values, setValues] = useState<FormValues>({
+    ...EMPTY,
+    subject: isContactSubject(initialSubject) ? initialSubject : '',
+  });
   const [errors, setErrors] = useState<ContactFieldErrors>({});
-  const [stage, setStage] = useState<Stage>('editing');
-  const [prepared, setPrepared] = useState<ContactFields | null>(null);
-  const [channel, setChannel] = useState<Channel>('whatsapp');
+  const [sent, setSent] = useState<{ channel: Channel; fields: ContactFields } | null>(null);
+  const channelRef = useRef<Channel>('whatsapp');
   const panelRef = useRef<HTMLDivElement>(null);
   const firstErrorRef = useRef<ContactFieldName | null>(null);
 
   useEffect(() => {
-    if (stage !== 'editing') panelRef.current?.focus();
-  }, [stage]);
+    if (sent) panelRef.current?.focus();
+  }, [sent]);
 
   useEffect(() => {
     const field = firstErrorRef.current;
@@ -72,127 +88,76 @@ export const ContactForm: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const normalised = normaliseContactInput(values);
-    const validation = validateContactFields(normalised);
+    const channel = channelRef.current;
+    const fields = normaliseContactInput(values);
+    const validation = validateContactFields(fields);
     if (hasErrors(validation)) {
       setErrors(validation);
       firstErrorRef.current = (Object.keys(validation) as ContactFieldName[])[0] ?? null;
       return;
     }
-    setPrepared(normalised);
-    setStage('ready');
+    openChannel(channelLinks(fields)[channel], channel);
+    setSent({ channel, fields });
   };
 
   const reset = () => {
     setValues(EMPTY);
     setErrors({});
-    setPrepared(null);
-    setStage('editing');
+    setSent(null);
   };
 
-  if (stage !== 'editing' && prepared) {
-    const whatsappText = buildContactMessage(prepared, 'whatsapp');
-    const emailText = buildContactMessage(prepared, 'email');
-    const subjectLabel = prepared.subject ? CONTACT_SUBJECTS[prepared.subject] : '';
-
+  if (sent) {
+    const links = channelLinks(sent.fields);
+    const other: Channel = sent.channel === 'whatsapp' ? 'email' : 'whatsapp';
     return (
       <div ref={panelRef} tabIndex={-1} role="status" aria-live="polite" className="outline-none space-y-6">
-        {stage === 'opened' ? (
-          <>
-            <div className="flex items-center gap-3 text-ink">
-              <Check className="w-5 h-5 text-orange-ink" aria-hidden="true" />
-              <h3 className="font-display text-xl sm:text-2xl font-bold">Mensagem preparada.</h3>
-            </div>
-            <p className="text-base text-ink-2 font-light text-pretty max-w-prose">
-              {channel === 'whatsapp'
-                ? `A sua mensagem abriu no WhatsApp da YELA Corporation (${CONTACT.whatsappFormatted}). Depois de a enviar, respondemos pelo mesmo canal.`
-                : `A sua mensagem abriu no seu programa de email, dirigida a ${CONTACT.email}. Depois de a enviar, respondemos por email.`}
-            </p>
-            <p className="text-sm text-ink-3 text-pretty max-w-prose">
-              Não abriu nada? Pode{' '}
-              <a
-                href={channel === 'whatsapp' ? mailtoHref(buildEmailSubject(prepared), emailText) : whatsappHref(whatsappText)}
-                target={channel === 'whatsapp' ? undefined : '_blank'}
-                rel={channel === 'whatsapp' ? undefined : 'noopener noreferrer'}
-                className="underline underline-offset-4 text-ink hover:text-orange-ink"
-              >
-                {channel === 'whatsapp' ? 'enviar por email' : 'enviar pelo WhatsApp'}
-              </a>{' '}
-              ou contactar-nos directamente: {CONTACT.whatsappFormatted} · {CONTACT.email}.
-            </p>
-            <button type="button" onClick={reset} className={textLink}>
-              Nova mensagem
-            </button>
-          </>
-        ) : (
-          <>
-            <div>
-              <h3 className="font-display text-xl sm:text-2xl font-bold text-ink">Escolha como enviar.</h3>
-              <p className="mt-2 text-base text-ink-2 font-light text-pretty max-w-prose">
-                A mensagem abre no WhatsApp ou no seu email, já preenchida. É você que a envia; o website não guarda
-                nem transmite os seus dados.
-              </p>
-            </div>
-
-            <dl className="border-t border-line divide-y divide-line-soft text-sm">
-              <div className="py-2.5 grid grid-cols-[7rem_1fr] gap-3">
-                <dt className="font-mono text-xs uppercase tracking-[0.14em] text-ink-3 pt-0.5">Nome</dt>
-                <dd className="text-ink">{prepared.name}</dd>
-              </div>
-              {prepared.organization && (
-                <div className="py-2.5 grid grid-cols-[7rem_1fr] gap-3">
-                  <dt className="font-mono text-xs uppercase tracking-[0.14em] text-ink-3 pt-0.5">Organização</dt>
-                  <dd className="text-ink">{prepared.organization}</dd>
-                </div>
-              )}
-              <div className="py-2.5 grid grid-cols-[7rem_1fr] gap-3">
-                <dt className="font-mono text-xs uppercase tracking-[0.14em] text-ink-3 pt-0.5">Assunto</dt>
-                <dd className="text-ink">{subjectLabel}</dd>
-              </div>
-              <div className="py-2.5 grid grid-cols-[7rem_1fr] gap-3">
-                <dt className="font-mono text-xs uppercase tracking-[0.14em] text-ink-3 pt-0.5">Mensagem</dt>
-                <dd className="text-ink whitespace-pre-line">{prepared.message}</dd>
-              </div>
-            </dl>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <a
-                href={whatsappHref(whatsappText)}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  setChannel('whatsapp');
-                  setStage('opened');
-                }}
-                className={primaryButton}
-              >
-                <MessageCircle className="w-4 h-4 text-orange" aria-hidden="true" />
-                Enviar pelo WhatsApp
-              </a>
-              <a
-                href={mailtoHref(buildEmailSubject(prepared), emailText)}
-                onClick={() => {
-                  setChannel('email');
-                  setStage('opened');
-                }}
-                className={secondaryButton}
-              >
-                <Mail className="w-4 h-4" aria-hidden="true" />
-                Enviar por email
-              </a>
-            </div>
-
-            <button type="button" onClick={() => setStage('editing')} className={textLink}>
-              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
-              Editar mensagem
-            </button>
-          </>
-        )}
+        <div className="flex items-center gap-3 text-ink">
+          <Check className="w-5 h-5 text-orange-ink" aria-hidden="true" />
+          <h3 className="font-display text-xl sm:text-2xl font-bold">
+            {sent.channel === 'whatsapp' ? 'Mensagem aberta no WhatsApp.' : 'Mensagem aberta no seu email.'}
+          </h3>
+        </div>
+        <p className="text-base text-ink-2 font-light text-pretty max-w-prose">
+          {sent.channel === 'whatsapp'
+            ? `Falta só carregar em enviar na conversa com a YELA Corporation (${CONTACT.whatsappFormatted}). Respondemos pelo mesmo canal.`
+            : `Falta só carregar em enviar no seu programa de email, para ${CONTACT.email}. Respondemos por email.`}
+        </p>
+        <p className="text-sm text-ink-3 text-pretty max-w-prose">
+          Não abriu nada?{' '}
+          <a
+            href={links[other]}
+            target={other === 'whatsapp' ? '_blank' : undefined}
+            rel={other === 'whatsapp' ? 'noopener noreferrer' : undefined}
+            className="underline underline-offset-4 text-ink hover:text-orange-ink"
+          >
+            {other === 'whatsapp' ? 'Enviar pelo WhatsApp' : 'Enviar por email'}
+          </a>{' '}
+          ou{' '}
+          <a
+            href={links[sent.channel]}
+            target={sent.channel === 'whatsapp' ? '_blank' : undefined}
+            rel={sent.channel === 'whatsapp' ? 'noopener noreferrer' : undefined}
+            className="underline underline-offset-4 text-ink hover:text-orange-ink"
+          >
+            tentar de novo
+          </a>
+          .
+        </p>
+        <div className="flex flex-wrap gap-x-8 gap-y-2">
+          <button type="button" onClick={() => setSent(null)} className={textLink}>
+            <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
+            Voltar ao formulário
+          </button>
+          <button type="button" onClick={reset} className={textLink}>
+            Nova mensagem
+          </button>
+        </div>
       </div>
     );
   }
 
-  const describedBy = (name: ContactFieldName) => (errors[name] ? errorId(name) : undefined);
+  const describedBy = (name: ContactFieldName, extra?: string) =>
+    [errors[name] ? errorId(name) : null, extra ?? null].filter(Boolean).join(' ') || undefined;
   const FieldError: React.FC<{ name: ContactFieldName }> = ({ name }) =>
     errors[name] ? (
       <p id={errorId(name)} className="mt-1.5 text-sm text-red-800">
@@ -202,6 +167,10 @@ export const ContactForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-7">
+      <p className="text-sm text-ink-3">
+        Campos assinalados com <span className="text-orange-ink">*</span> são obrigatórios.
+      </p>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
         <div>
           <label htmlFor={fieldId('name')} className={labelClass}>
@@ -273,6 +242,7 @@ export const ContactForm: React.FC = () => {
             type="tel"
             inputMode="tel"
             autoComplete="tel"
+            placeholder="+258 8x xxx xxxx"
             maxLength={CONTACT_LIMITS.phone.max}
             value={values.phone}
             onChange={update('phone')}
@@ -316,23 +286,38 @@ export const ContactForm: React.FC = () => {
           id={fieldId('message')}
           name="message"
           rows={5}
+          placeholder="Descreva o contexto, o objectivo e, se souber, o prazo."
           maxLength={CONTACT_LIMITS.message.max}
           value={values.message}
           onChange={update('message')}
           aria-required="true"
           aria-invalid={errors.message ? 'true' : undefined}
-          aria-describedby={describedBy('message')}
+          aria-describedby={describedBy('message', `${baseId}-message-hint`)}
           className={`${inputClass} ${errors.message ? inputErrorClass : ''} resize-y min-h-28`}
         />
-        <FieldError name="message" />
+        <div className="mt-1.5 flex justify-between gap-4">
+          <FieldError name="message" />
+          <p id={`${baseId}-message-hint`} className="ml-auto text-xs text-ink-3 tabular-nums">
+            {values.message.length} / {CONTACT_LIMITS.message.max}
+          </p>
+        </div>
       </div>
 
-      <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-4">
-        <button type="submit" className={primaryButton}>
-          Preparar mensagem
-        </button>
-        <p className="text-xs text-ink-3 text-pretty">
-          A mensagem abre no WhatsApp ou no seu email, já preenchida. Os dados servem apenas para responder ao seu pedido.{' '}
+      <div className="pt-2 space-y-4">
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-3">Enviar por</p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button type="submit" onClick={() => (channelRef.current = 'whatsapp')} className={primaryButton}>
+            <MessageCircle className="w-4 h-4 text-orange" aria-hidden="true" />
+            Enviar pelo WhatsApp
+          </button>
+          <button type="submit" onClick={() => (channelRef.current = 'email')} className={secondaryButton}>
+            <Mail className="w-4 h-4" aria-hidden="true" />
+            Enviar por email
+          </button>
+        </div>
+        <p className="text-xs text-ink-3 text-pretty max-w-prose">
+          A mensagem abre já preenchida no canal que escolher; é você que a envia. Os dados servem apenas para responder
+          ao seu pedido.{' '}
           <a href="/privacidade" className="underline underline-offset-4 hover:text-ink">
             Política de privacidade
           </a>
