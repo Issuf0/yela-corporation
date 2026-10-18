@@ -3,8 +3,15 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client", "node"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "jsx": "react-jsx",
     "strict": true,
     "noUncheckedIndexedAccess": true,
@@ -16,5 +23,11 @@
     "resolveJsonModule": true,
     "noEmit": true
   },
-  "include": ["src", "server", "api", "build", "tests", "vite.config.ts", "vitest.config.ts"]
+  "include": [
+    "src",
+    "build",
+    "tests",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ]
 }
