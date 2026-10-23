@@ -34,9 +34,9 @@ const inputClass =
 const inputErrorClass = 'border-red-700 focus:border-red-700';
 const labelClass = 'block font-mono text-xs uppercase tracking-[0.16em] text-ink-2 mb-1.5';
 const primaryButton =
-  'inline-flex items-center justify-center gap-2.5 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors whitespace-nowrap';
+  'inline-flex items-center justify-center gap-2.5 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors whitespace-nowrap press';
 const secondaryButton =
-  'inline-flex items-center justify-center gap-2.5 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-ink border border-ink/40 hover:border-ink hover:bg-paper-deep transition-colors whitespace-nowrap';
+  'inline-flex items-center justify-center gap-2.5 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-ink border border-ink/40 hover:border-ink hover:bg-paper-deep transition-colors whitespace-nowrap press';
 const textLink =
   'inline-flex min-h-11 items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-orange-ink hover:text-navy underline underline-offset-4';
 
@@ -110,7 +110,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ initialSubject = '' })
     const links = channelLinks(sent.fields);
     const other: Channel = sent.channel === 'whatsapp' ? 'email' : 'whatsapp';
     return (
-      <div ref={panelRef} tabIndex={-1} role="status" aria-live="polite" className="outline-none space-y-6">
+      <div ref={panelRef} tabIndex={-1} role="status" aria-live="polite" className="outline-none space-y-6 animate-fade">
         <div className="flex items-center gap-3 text-ink">
           <Check className="w-5 h-5 text-orange-ink" aria-hidden="true" />
           <h3 className="font-display text-xl sm:text-2xl font-bold">
@@ -160,7 +160,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ initialSubject = '' })
     [errors[name] ? errorId(name) : null, extra ?? null].filter(Boolean).join(' ') || undefined;
   const FieldError: React.FC<{ name: ContactFieldName }> = ({ name }) =>
     errors[name] ? (
-      <p id={errorId(name)} className="mt-1.5 text-sm text-red-800">
+      <p id={errorId(name)} className="mt-1.5 text-sm text-red-800 animate-fade">
         {errors[name]}
       </p>
     ) : null;

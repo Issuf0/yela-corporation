@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { CtaBand } from '../components/CtaBand';
-import { Container, Layout } from '../components/Layout';
+import { Container, Layout, riseStyle } from '../components/Layout';
 import { SectionMarker } from '../components/SectionMarker';
 import { CONTACT, SLOGAN } from '../config/site';
 import { PROMISE, SERVICE_AREAS } from '../data/services';
@@ -13,14 +13,14 @@ export const HomePage: React.FC = () => (
     <section className="pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pt-48 lg:pb-32" aria-labelledby="hero-title">
       <Container>
         <div className="max-w-4xl space-y-7 sm:space-y-8">
-          <h1 id="hero-title" className="font-display text-[2.6rem] leading-[1.06] sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-bold tracking-[-0.03em] text-ink text-balance">
+          <h1 id="hero-title" style={riseStyle(0)} className="rise font-display text-[2.6rem] leading-[1.06] sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-bold tracking-[-0.03em] text-ink text-balance">
             Ligamos desafios a oportunidades.
           </h1>
-          <p className="text-lg sm:text-xl text-ink-2 font-light leading-relaxed max-w-xl text-pretty">
+          <p style={riseStyle(1)} className="rise text-lg sm:text-xl text-ink-2 font-light leading-relaxed max-w-xl text-pretty">
             Arquitectura, construção e estúdio criativo, de {CONTACT.city} para todo o Moçambique. {SLOGAN}
           </p>
-          <div className="pt-1 flex flex-col sm:flex-row sm:items-center gap-5">
-            <a href="/contacto" className="group inline-flex items-center gap-3 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors">
+          <div style={riseStyle(2)} className="rise pt-1 flex flex-col sm:flex-row sm:items-center gap-5">
+            <a href="/contacto" className="group inline-flex items-center gap-3 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors press">
               <span>Fale connosco</span>
               <ArrowRight className="w-4 h-4 text-orange motion-safe:transition-transform motion-safe:group-hover:translate-x-1" aria-hidden="true" />
             </a>

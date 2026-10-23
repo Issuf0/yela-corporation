@@ -61,10 +61,205 @@
 
   /* Anchored sections sit below the fixed header. */
   [id] {
-    scroll-margin-top: 5.5rem;
+    scroll-margin-top: 6.5rem;
   }
 }
 
 @utility hairline {
   border-color: var(--color-line);
+}
+
+/* ------------------------------------------------------------------ */
+/* Movimento — discreto, rápido e sempre opcional                       */
+/* ------------------------------------------------------------------ */
+:root {
+  --ease-out-soft: cubic-bezier(0.22, 0.72, 0.18, 1);
+}
+
+@keyframes yela-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes yela-fade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes yela-drawer {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Entrada do topo de cada página, em cascata. */
+.rise {
+  animation: yela-rise 0.8s var(--ease-out-soft) both;
+  animation-delay: calc(var(--rise-i, 0) * 90ms + 60ms);
+}
+
+/* Revelação ao scroll (classes aplicadas por src/lib/reveal.ts). */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 0.7s var(--ease-out-soft),
+    transform 0.7s var(--ease-out-soft);
+  transition-delay: calc(var(--reveal-i, 0) * 70ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.animate-fade {
+  animation: yela-fade 0.45s var(--ease-out-soft) both;
+}
+.animate-drawer {
+  animation: yela-drawer 0.3s var(--ease-out-soft) both;
+}
+
+/* Sublinhado que cresce da esquerda (menu e ligações editoriais). */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: var(--color-orange);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease-out-soft);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after,
+.link-underline[aria-current='page']::after {
+  transform: scaleX(1);
+}
+
+/* Botões: resposta táctil subtil ao toque/clique. */
+.press {
+  transition-property: background-color, border-color, color, transform;
+  transition-duration: 0.2s;
+}
+.press:active {
+  transform: scale(0.985);
+}
+
+/* Cabeçalho: barra de progresso de leitura. */
+.header-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--color-orange);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* Cabeçalho: linha superior que recolhe ao descer. */
+.header-topbar {
+  display: none;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  transition:
+    grid-template-rows 0.35s var(--ease-out-soft),
+    opacity 0.25s ease,
+    border-color 0.25s ease;
+}
+.header-topbar > * {
+  min-height: 0;
+}
+@media (min-width: 48rem) {
+  .header-topbar {
+    display: grid;
+  }
+}
+.header-topbar.is-collapsed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  border-color: transparent;
+}
+
+/* Botão de menu: duas linhas que se cruzam num X. */
+.menu-toggle__line {
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 1.5px;
+  margin-left: -10px;
+  background: currentColor;
+  transition:
+    transform 0.35s var(--ease-out-soft),
+    top 0.35s var(--ease-out-soft);
+}
+.menu-toggle__line:first-child {
+  top: calc(50% - 4px);
+}
+.menu-toggle__line:last-child {
+  top: calc(50% + 3px);
+}
+.menu-toggle[data-open] .menu-toggle__line:first-child {
+  top: calc(50% - 0.75px);
+  transform: rotate(45deg);
+}
+.menu-toggle[data-open] .menu-toggle__line:last-child {
+  top: calc(50% - 0.75px);
+  transform: rotate(-45deg);
+}
+
+/* Itens do menu móvel entram em cascata. */
+.drawer-item {
+  animation: yela-fade 0.4s var(--ease-out-soft) both;
+  animation-delay: calc(var(--drawer-i, 0) * 45ms + 60ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .animate-fade,
+  .animate-drawer,
+  .drawer-item {
+    animation: none;
+  }
+  .menu-toggle__line,
+  .site-header,
+  .header-topbar {
+    transition: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .link-underline::after {
+    transition: none;
+  }
+  .press:active {
+    transform: none;
+  }
 }

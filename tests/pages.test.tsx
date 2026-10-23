@@ -121,11 +121,11 @@ describe('navigation config', () => {
     expect(container.querySelector('a[href="https://learn-code-ruddy.vercel.app/"]')).toBeTruthy();
   });
 
-  it('contact page and footer link to Instagram and Facebook with an icon', () => {
+  it('header, contact page and footer link to Instagram and Facebook with an icon', () => {
     const { container } = render(<ContactoPage />);
     for (const url of ['https://www.instagram.com/yela_corporation', 'https://www.facebook.com/yelacorporation']) {
       const links = Array.from(container.querySelectorAll(`a[href="${url}"]`));
-      expect(links.length, `missing link ${url}`).toBe(2);
+      expect(links.length, `missing link ${url}`).toBe(3); // cabeçalho, página de contacto e rodapé
       for (const link of links) {
         expect(link.querySelector('svg[aria-hidden="true"]')).toBeTruthy();
         expect(link.getAttribute('rel')).toContain('noopener');
@@ -139,5 +139,28 @@ describe('navigation config', () => {
     expect(container.textContent).toContain('yelacorp.info@gmail.com');
     expect(container.textContent).toContain('+258 84 530 6215');
     expect(container.textContent).not.toMatch(/resend/i);
+  });
+});
+
+describe('header behaviour', () => {
+  it('shows Contacto as the call to action on desktop (not twice) and marks it current on /contacto', () => {
+    const { container } = render(<ContactoPage />);
+    const desktopNav = container.querySelector('nav[aria-label="Navegação principal"]')!;
+    expect(desktopNav.querySelector('a[href="/contacto"]')).toBeNull();
+    const cta = Array.from(container.querySelectorAll('header a[href="/contacto"]')).find((a) => a.textContent?.includes('Fale connosco'))!;
+    expect(cta.getAttribute('aria-current')).toBe('page');
+  });
+
+  it('locks page scroll while the mobile menu is open and returns focus to the button on Escape', () => {
+    const { container } = render(<HomePage />);
+    const button = within(container.querySelector('header')!).getByRole('button', { name: /abrir menu/i });
+    fireEvent.click(button);
+    expect(document.documentElement.style.overflow).toBe('hidden');
+    const drawer = container.querySelector(`[id="${button.getAttribute('aria-controls')}"]`)!;
+    expect(drawer.querySelector('a[href^="https://wa.me/"]')).toBeTruthy();
+    expect(drawer.querySelector('a[href^="mailto:"]')).toBeTruthy();
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(document.documentElement.style.overflow).toBe('');
+    expect(document.activeElement).toBe(button);
   });
 });

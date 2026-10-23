@@ -27,7 +27,7 @@ export const CtaBand: React.FC<CtaBandProps> = ({
       <div className="lg:col-span-4 flex lg:justify-end">
         <a
           href={href}
-          className="group inline-flex items-center gap-3 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors"
+          className="group inline-flex items-center gap-3 min-h-12 px-7 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors press"
         >
           <span>{action}</span>
           <ArrowRight className="w-4 h-4 text-orange motion-safe:transition-transform motion-safe:group-hover:translate-x-1" aria-hidden="true" />
