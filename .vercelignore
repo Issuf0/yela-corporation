@@ -1,6 +1,6 @@
-tests
-docs
-assets
-.claude
-*.md
-!README.md
+# Só a raiz do projecto: originais e documentos internos que não vão para o site.
+# (Sem a barra inicial, «assets» excluiria também src/assets/, com o logótipo usado no build.)
+/assets
+/tests
+/docs
+/.claude
