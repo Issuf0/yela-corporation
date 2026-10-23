@@ -1,14 +1,8 @@
-import { ArrowRight, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { ArrowRight, Mail, MessageCircle } from 'lucide-react';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { NAV_PAGES } from '../config/nav';
-import { CONTACT, SOCIAL, whatsappHref } from '../config/site';
+import { CONTACT, whatsappHref } from '../config/site';
 import { Wordmark } from './Logo';
-import { FacebookIcon, InstagramIcon } from './SocialIcons';
-
-const SOCIAL_ICONS: Record<string, React.FC<{ className?: string }>> = {
-  Instagram: InstagramIcon,
-  Facebook: FacebookIcon,
-};
 
 interface HeaderProps {
   currentPath: string;
@@ -21,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Estado ao fazer scroll: sombra, linha superior recolhida e barra de progresso. O cabeçalho fica sempre fixo.
+  // Estado ao fazer scroll: sombra, altura compacta e barra de progresso. O cabeçalho fica sempre fixo.
   useEffect(() => {
     let frame = 0;
     const update = () => {
@@ -77,7 +71,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
     'group inline-flex items-center justify-center gap-2.5 min-h-11 px-5 text-xs font-semibold tracking-[0.14em] uppercase text-white bg-navy hover:bg-navy-soft transition-colors whitespace-nowrap press';
   const ctaDesktopClass =
     'group inline-flex items-center gap-2.5 min-h-10 px-4 text-[11px] font-semibold tracking-[0.18em] uppercase text-ink border border-ink/70 hover:bg-navy hover:border-navy hover:text-white transition-colors whitespace-nowrap press';
-  const topLink = 'inline-flex items-center gap-2 py-1 hover:text-ink transition-colors';
 
   return (
     <>
@@ -94,45 +87,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
           solid ? 'bg-paper/92 backdrop-blur-md border-line shadow-[0_6px_24px_-18px_rgba(15,36,57,0.35)]' : 'bg-paper border-line'
         }`}
       >
-        {/* Linha superior: contactos e redes. Recolhe ao descer a página; escondida no telemóvel. */}
-        <div className={`header-topbar border-b border-line-soft ${isScrolled ? 'is-collapsed' : ''}`} aria-hidden={isScrolled ? true : undefined}>
-          <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 h-9 flex items-center justify-between gap-6 text-[12px] text-ink-3">
-            <div className="flex items-center gap-6">
-              <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className={topLink} tabIndex={isScrolled ? -1 : undefined}>
-                <MessageCircle className="w-3.5 h-3.5 text-orange-ink" aria-hidden="true" />
-                {CONTACT.whatsappFormatted}
-              </a>
-              <a href={`mailto:${CONTACT.email}`} className={topLink} tabIndex={isScrolled ? -1 : undefined}>
-                <Mail className="w-3.5 h-3.5 text-orange-ink" aria-hidden="true" />
-                {CONTACT.email}
-              </a>
-            </div>
-            <div className="flex items-center gap-5">
-              <span className="inline-flex items-center gap-2">
-                <MapPin className="w-3.5 h-3.5 text-orange-ink" aria-hidden="true" />
-                {CONTACT.city}, {CONTACT.country}
-              </span>
-              <span className="h-3 w-px bg-line" aria-hidden="true" />
-              {SOCIAL.map((social) => {
-                const Icon = SOCIAL_ICONS[social.name];
-                return (
-                  <a
-                    key={social.name}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${social.name} da YELA Corporation`}
-                    className="py-1 hover:text-ink transition-colors"
-                    tabIndex={isScrolled ? -1 : undefined}
-                  >
-                    {Icon ? <Icon className="w-3.5 h-3.5" /> : social.name}
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
         <div
           className={`max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex items-center justify-between gap-6 transition-[padding] duration-300 ${
             isScrolled ? 'py-3' : 'py-4 md:py-5'

@@ -121,11 +121,11 @@ describe('navigation config', () => {
     expect(container.querySelector('a[href="https://learn-code-ruddy.vercel.app/"]')).toBeTruthy();
   });
 
-  it('header, contact page and footer link to Instagram and Facebook with an icon', () => {
+  it('contact page and footer link to Instagram and Facebook with an icon', () => {
     const { container } = render(<ContactoPage />);
     for (const url of ['https://www.instagram.com/yela_corporation', 'https://www.facebook.com/yelacorporation']) {
       const links = Array.from(container.querySelectorAll(`a[href="${url}"]`));
-      expect(links.length, `missing link ${url}`).toBe(3); // cabeçalho, página de contacto e rodapé
+      expect(links.length, `missing link ${url}`).toBe(2); // página de contacto e rodapé
       for (const link of links) {
         expect(link.querySelector('svg[aria-hidden="true"]')).toBeTruthy();
         expect(link.getAttribute('rel')).toContain('noopener');

@@ -61,7 +61,7 @@
 
   /* Anchored sections sit below the fixed header. */
   [id] {
-    scroll-margin-top: 6.5rem;
+    scroll-margin-top: 5.5rem;
   }
 }
 
@@ -182,30 +182,6 @@
   pointer-events: none;
 }
 
-/* Cabeçalho: linha superior que recolhe ao descer. */
-.header-topbar {
-  display: none;
-  grid-template-rows: 1fr;
-  overflow: hidden;
-  transition:
-    grid-template-rows 0.35s var(--ease-out-soft),
-    opacity 0.25s ease,
-    border-color 0.25s ease;
-}
-.header-topbar > * {
-  min-height: 0;
-}
-@media (min-width: 48rem) {
-  .header-topbar {
-    display: grid;
-  }
-}
-.header-topbar.is-collapsed {
-  grid-template-rows: 0fr;
-  opacity: 0;
-  border-color: transparent;
-}
-
 /* Botão de menu: duas linhas que se cruzam num X. */
 .menu-toggle__line {
   position: absolute;
@@ -247,8 +223,7 @@
     animation: none;
   }
   .menu-toggle__line,
-  .site-header,
-  .header-topbar {
+  .site-header {
     transition: none;
   }
   .reveal {
