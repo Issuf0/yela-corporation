@@ -8,9 +8,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "vite --port=3000",
+    "dev": "vite --port=3000 --host",
     "build": "vite build",
-    "preview": "vite preview --port=4173",
+    "preview": "vite preview --port=4173 --host",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "test": "vitest run",

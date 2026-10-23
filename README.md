@@ -41,7 +41,7 @@ Requisitos: Node.js 20 ou superior.
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
+npm run dev        # http://localhost:3000 e, na mesma rede Wi-Fi, o endereço «Network» mostrado no terminal
 npm run typecheck  # tsc --noEmit
 npm test           # vitest
 npm run build      # gera dist/ (inclui robots.txt e, com SITE_URL, sitemap.xml)
