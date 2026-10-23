@@ -1,44 +1,42 @@
 import React from 'react';
+import monogramUrl from '../assets/brand/yela-monogram.png';
+
+/** Proporção do monograma oficial (largura / altura), para reservar espaço e evitar saltos. */
+const MONOGRAM_RATIO = 226 / 192;
 
 interface MonogramProps {
   className?: string;
-  title?: string;
+  /** Altura em píxeis CSS; a largura segue a proporção oficial. */
+  size?: number;
+  /** Texto alternativo; vazio quando o monograma é decorativo (acompanhado do nome). */
+  alt?: string;
 }
 
-/**
- * Geometric SVG redraw of the YELA "Y" monogram: navy chevron + stem, orange
- * right arm and soft-orange lower panel. Colours sampled from the official
- * logo. Pending formal approval by YELA Corporation.
- */
-export const Monogram: React.FC<MonogramProps> = ({ className = '', title }) => (
-  <svg
-    viewBox="0 0 100 100"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    role={title ? 'img' : undefined}
-    aria-hidden={title ? undefined : true}
-    focusable="false"
-  >
-    {title ? <title>{title}</title> : null}
-    <polygon points="16,10 34,10 64,40 64,84 50,96 50,44" fill="var(--color-navy, #0f2439)" />
-    <polygon points="68,10 86,10 61.5,34.5 52.5,25.5" fill="var(--color-orange, #e78a22)" />
-    <polygon points="34,31 48,45 48,84 34,70" fill="var(--color-orange-soft, #e6a34c)" />
-  </svg>
+/** Monograma «Y» oficial da YELA Corporation (assets/Logo … Prancheta 1.png). */
+export const Monogram: React.FC<MonogramProps> = ({ className = '', size = 28, alt = '' }) => (
+  <img
+    src={monogramUrl}
+    alt={alt}
+    width={Math.round(size * MONOGRAM_RATIO)}
+    height={size}
+    decoding="async"
+    draggable={false}
+    className={`select-none ${className}`}
+  />
 );
 
 interface WordmarkProps {
   className?: string;
-  /** Size of the wordmark text; the monogram scales with it. */
   size?: 'sm' | 'md';
 }
 
-/** Monogram + tracked wordmark, used in the header and footer. */
+/** Monograma oficial + nome, usado no cabeçalho. */
 export const Wordmark: React.FC<WordmarkProps> = ({ className = '', size = 'sm' }) => {
-  const markClass = size === 'md' ? 'h-9 w-9' : 'h-7 w-7';
+  const markSize = size === 'md' ? 36 : 30;
   const textClass = size === 'md' ? 'text-sm' : 'text-xs';
   return (
     <span className={`inline-flex items-center gap-3 ${className}`}>
-      <Monogram className={`${markClass} shrink-0`} />
+      <Monogram size={markSize} className="shrink-0" />
       <span className={`${textClass} font-bold uppercase tracking-[0.22em] text-ink whitespace-nowrap`}>
         YELA Corporation
       </span>

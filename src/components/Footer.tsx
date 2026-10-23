@@ -14,7 +14,7 @@ export const Footer: React.FC = () => (
   <footer className="border-t border-line py-10 sm:py-12 text-ink-3 text-xs">
     <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-6 items-start">
       <div className="md:col-span-5 flex items-start gap-3">
-        <Monogram className="h-8 w-8 shrink-0 mt-0.5" />
+        <Monogram size={32} className="shrink-0 mt-0.5" />
         <div className="space-y-1">
           <p className="text-ink tracking-[0.22em] uppercase font-bold text-xs">{LEGAL_NAME}</p>
           <p className="text-ink-3 text-[11px] tracking-[0.12em] uppercase">{TAGLINE}</p>

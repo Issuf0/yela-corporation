@@ -29,7 +29,8 @@ src/lib/contactMessage.ts      texto da mensagem enviada por WhatsApp/email
 src/index.css                  tokens de design (@theme) e estilos base
 build/seoPlugin.ts             canonical, og:url, og:image, robots.txt e sitemap.xml (depende de SITE_URL)
 build/cleanUrlsPlugin.ts       em dev/preview serve /sobre como sobre.html (como o cleanUrls da Vercel)
-public/                        favicon.svg/.ico, apple-touch-icon.png, og-image.png
+public/                        favicon.png/.ico, apple-touch-icon.png, og-image.png (gerados a partir do logótipo oficial)
+src/assets/brand/              monograma e logótipo horizontal oficiais (recortados de assets/*.png)
 tests/                         vitest
 vercel.json                    cabeçalhos de segurança, cache, cleanUrls
 assets/                        referências (logótipo JPEG original, acordo) — não são publicadas
@@ -119,6 +120,7 @@ O histórico git contém uma implementação completa e testada de envio automá
 - Confirmar a sede (Nampula, segundo o portfólio) e os telefones (WhatsApp +258 84 530 6215; telefone +258 83 444 6767).
 - Confirmar se o OHOLO Podcast é parceiro externo (como está em /parcerias) ou produção própria (o portfólio coloca-o no Departamento de Produção Audiovisual e Media).
 - Autorizar a publicação dos nomes da equipa em /sobre.
-- Aprovar o redesenho vectorial do logótipo (`src/components/Logo.tsx`, `public/favicon.svg`) e a imagem de partilha `public/og-image.png`.
+- Aprovar a imagem de partilha `public/og-image.png` (feita com o logótipo oficial).
+- Se existir, enviar o logótipo em SVG para máxima nitidez; hoje usam-se os PNG oficiais.
 - Morada completa e registo comercial, e prazo de conservação de mensagens, para a página de privacidade.
 - Registar o domínio, criar a conta Vercel e definir `SITE_URL`.
